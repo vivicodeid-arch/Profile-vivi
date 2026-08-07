@@ -1,51 +1,69 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Code2, Zap, Globe } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 
 // ---------------------------------------------------------------------------
-// HeroParticles — purely decorative floating dots
+// Particles — floating dots dalam palet biru
 // ---------------------------------------------------------------------------
-
-// Particles are generated once at module level so they don't re-randomise on
-// every render. They are purely decorative, so a stable array is fine.
-const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
   id: i,
-  size: Math.random() * 3 + 1,
+  size: Math.random() * 4 + 1.5,
   left: Math.random() * 100,
   top: Math.random() * 100,
-  delay: Math.random() * 6,
-  duration: Math.random() * 4 + 5,
-  opacity: Math.random() * 0.4 + 0.1,
+  delay: Math.random() * 8,
+  duration: Math.random() * 5 + 6,
+  opacity: Math.random() * 0.35 + 0.1,
+  color: ['#90CAF9', '#2196F3', '#E3F2FD'][Math.floor(Math.random() * 3)],
 }));
 
 function HeroParticles() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(33,150,243,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(33,150,243,0.06) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      {/* Floating dots */}
       {PARTICLES.map(p => (
         <div
           key={p.id}
-          className="absolute rounded-full bg-blue-400"
+          className="absolute rounded-full"
           style={{
-            width:     p.size,
-            height:    p.size,
-            left:      `${p.left}%`,
-            top:       `${p.top}%`,
-            opacity:   p.opacity,
+            width: p.size,
+            height: p.size,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            opacity: p.opacity,
+            backgroundColor: p.color,
             animation: `particle-drift ${p.duration}s ${p.delay}s ease-in-out infinite`,
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
+// Feature badge kecil di atas judul
+// ---------------------------------------------------------------------------
+const FEATURES = [
+  { icon: Code2,  label: 'Custom Development' },
+  { icon: Zap,    label: 'Fast & Optimized'   },
+  { icon: Globe,  label: 'SEO Ready'          },
+];
+
+// ---------------------------------------------------------------------------
 // HeroSection
 // ---------------------------------------------------------------------------
-
 export default function HeroSection() {
   const { t, i18n } = useTranslation(['common', 'pages']);
   const lang = i18n.language as 'id' | 'en';
@@ -57,11 +75,21 @@ export default function HeroSection() {
     return () => clearTimeout(timer);
   }, []);
 
+  const fadeIn = (delay: string): React.CSSProperties => ({
+    opacity:         visible ? 1 : 0,
+    transform:       visible ? 'translateY(0)' : 'translateY(28px)',
+    transition:      'opacity 700ms, transform 700ms',
+    transitionDelay: delay,
+  });
+
   const heroTitle =
     lang === 'en' ? (
       <>
         Build a{' '}
-        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]">
+        <span
+          className="bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]"
+          style={{ backgroundImage: 'linear-gradient(90deg, #90CAF9, #2196F3, #E3F2FD, #2196F3, #90CAF9)' }}
+        >
           Professional
         </span>{' '}
         Website for Your Business
@@ -69,40 +97,72 @@ export default function HeroSection() {
     ) : (
       <>
         Bangun Website{' '}
-        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]">
+        <span
+          className="bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]"
+          style={{ backgroundImage: 'linear-gradient(90deg, #90CAF9, #2196F3, #E3F2FD, #2196F3, #90CAF9)' }}
+        >
           Profesional
         </span>{' '}
         untuk Bisnis Anda
       </>
     );
 
-  const fadeIn = (delay: string): React.CSSProperties => ({
-    opacity:          visible ? 1 : 0,
-    transform:        visible ? 'translateY(0)' : 'translateY(24px)',
-    transition:       'opacity 700ms, transform 700ms',
-    transitionDelay:  delay,
-  });
-
   return (
-    <section className="relative min-h-screen flex items-center bg-[linear-gradient(135deg,_#042f2e_0%,_#065f46_30%,_#0f766e_55%,_#134e4a_75%,_#021d1b_100%)] text-white pt-20 overflow-hidden">
-      {/* Radial glows — teal/emerald tone */}
+    <section
+      className="relative min-h-screen flex items-center text-white pt-20 overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 25%, #1976D2 50%, #0D47A1 75%, #0a3880 100%)',
+      }}
+    >
+      {/* Radial glows */}
       <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,_rgba(20,184,166,0.15)_0%,_transparent_60%),_radial-gradient(ellipse_at_80%_20%,_rgba(16,185,129,0.12)_0%,_transparent_55%),_radial-gradient(ellipse_at_60%_80%,_rgba(6,182,212,0.08)_0%,_transparent_50%)]"
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 15% 50%, rgba(33,150,243,0.25) 0%, transparent 55%),
+            radial-gradient(ellipse at 85% 15%, rgba(144,202,249,0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 55% 85%, rgba(13,71,161,0.30) 0%, transparent 45%)
+          `,
+        }}
         aria-hidden="true"
       />
+
+      {/* Decorative large circle blur kiri */}
+      <div
+        className="absolute -left-40 top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none"
+        style={{ backgroundColor: 'rgba(33,150,243,0.12)' }}
+        aria-hidden="true"
+      />
+
+      {/* Decorative large circle blur kanan */}
+      <div
+        className="absolute -right-40 bottom-0 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none"
+        style={{ backgroundColor: 'rgba(144,202,249,0.08)' }}
+        aria-hidden="true"
+      />
+
       <HeroParticles />
 
       <div className="container-custom relative z-10 py-12 lg:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-          {/* Left: text */}
+          {/* ── Left: text ─────────────────────────────────────────────────── */}
           <div className="max-w-2xl">
+
             {/* Badge */}
             <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-6"
-              style={fadeIn('0ms')}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-6 border"
+              style={{
+                backgroundColor: 'rgba(144,202,249,0.12)',
+                borderColor: 'rgba(144,202,249,0.30)',
+                color: '#90CAF9',
+                ...fadeIn('0ms'),
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse-slow" />
+              <span
+                className="w-2 h-2 rounded-full animate-pulse-slow"
+                style={{ backgroundColor: '#2196F3' }}
+              />
               Web Developer Profesional
             </div>
 
@@ -116,31 +176,78 @@ export default function HeroSection() {
 
             {/* Subtitle */}
             <p
-              className="text-lg lg:text-xl text-gray-300 leading-relaxed mb-10 max-w-xl"
-              style={fadeIn('240ms')}
+              className="text-lg lg:text-xl leading-relaxed mb-8 max-w-xl"
+              style={{ ...fadeIn('240ms'), color: '#90CAF9' }}
             >
               {t('home.hero.subtitle', { ns: 'pages' })}
             </p>
+
+            {/* Feature pills */}
+            <div
+              className="flex flex-wrap gap-3 mb-10"
+              style={fadeIn('300ms')}
+            >
+              {FEATURES.map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
+                  style={{
+                    backgroundColor: 'rgba(33,150,243,0.10)',
+                    borderColor: 'rgba(33,150,243,0.25)',
+                    color: '#E3F2FD',
+                  }}
+                >
+                  <Icon className="w-3.5 h-3.5" style={{ color: '#2196F3' }} aria-hidden="true" />
+                  {label}
+                </div>
+              ))}
+            </div>
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4" style={fadeIn('360ms')}>
               <Link
                 to="/services"
-                className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base px-8 py-4 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 w-fit"
+                className="font-semibold text-base px-8 py-4 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 hover:shadow-lg w-fit"
+                style={{
+                  backgroundColor: '#2196F3',
+                  color: '#fff',
+                  boxShadow: '0 0 0 0 rgba(33,150,243,0)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#1976D2';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 30px rgba(33,150,243,0.4)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#2196F3';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
               >
                 {t('nav.services', { ns: 'common' })}
                 <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
               <Link
                 to="/portfolio"
-                className="border border-white/20 hover:border-white/40 text-white hover:bg-white/5 font-medium text-base px-8 py-4 rounded-full inline-flex items-center justify-center transition-all duration-200 hover:scale-105 w-fit"
+                className="font-medium text-base px-8 py-4 rounded-full inline-flex items-center justify-center transition-all duration-200 hover:scale-105 w-fit border"
+                style={{
+                  borderColor: 'rgba(144,202,249,0.40)',
+                  color: '#E3F2FD',
+                  backgroundColor: 'transparent',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(144,202,249,0.10)';
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(144,202,249,0.70)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(144,202,249,0.40)';
+                }}
               >
                 {t('nav.portfolio', { ns: 'common' })}
               </Link>
             </div>
           </div>
 
-          {/* Right: mockup image */}
+          {/* ── Right: mockup image ─────────────────────────────────────────── */}
           <div
             className="relative w-full flex justify-center lg:justify-end mt-10 lg:mt-0"
             style={{
@@ -150,11 +257,29 @@ export default function HeroSection() {
               transitionDelay: '200ms',
             }}
           >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-600/20 blur-[100px] rounded-full animate-pulse-slow" />
+            {/* Glow di belakang gambar */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] rounded-full blur-[80px] animate-pulse-slow"
+              style={{ backgroundColor: 'rgba(33,150,243,0.18)' }}
+              aria-hidden="true"
+            />
+
+            {/* Ring dekoratif */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] rounded-full border opacity-20"
+              style={{ borderColor: '#2196F3' }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[105%] h-[105%] rounded-full border opacity-10"
+              style={{ borderColor: '#90CAF9' }}
+              aria-hidden="true"
+            />
+
             <img
               src={settings.heroImageUrl || '/hero-mockup.png'}
               alt="Website Mockup"
-              className="relative z-10 w-full max-w-[600px] h-auto object-contain drop-shadow-2xl animate-float"
+              className="relative z-10 w-full max-w-[560px] h-auto object-contain drop-shadow-2xl animate-float"
             />
           </div>
         </div>
@@ -162,12 +287,26 @@ export default function HeroSection() {
 
       {/* Scroll indicator */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
-        style={{ opacity: visible ? 0.6 : 0, transition: 'opacity 700ms', transitionDelay: '800ms' }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+        style={{ opacity: visible ? 0.6 : 0, transition: 'opacity 700ms', transitionDelay: '900ms' }}
         aria-hidden="true"
       >
-        <span className="text-xs text-gray-400 tracking-widest uppercase">Scroll</span>
-        <div className="w-px h-8 bg-gradient-to-b from-gray-400 to-transparent animate-pulse-slow" />
+        <span className="text-xs tracking-widest uppercase" style={{ color: '#90CAF9' }}>Scroll</span>
+        <div
+          className="w-px h-8 animate-pulse-slow"
+          style={{ background: 'linear-gradient(to bottom, #2196F3, transparent)' }}
+        />
+      </div>
+
+      {/* Wave divider bawah */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none" aria-hidden="true">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-[40px]">
+          <path
+            d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z"
+            fill="white"
+            className="dark:fill-gray-900"
+          />
+        </svg>
       </div>
     </section>
   );
