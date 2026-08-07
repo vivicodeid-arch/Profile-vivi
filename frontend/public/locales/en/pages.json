@@ -1,0 +1,109 @@
+{
+  "home": {
+    "hero": {
+      "title": "Build a Professional Website for Your Business",
+      "subtitle": "ViviDev.id turns your digital ideas into a modern, fast, and Google-friendly website.",
+      "cta": "Free Consultation",
+      "ctaSub": "View Portfolio"
+    },
+    "stats": {
+      "projects": "Projects Done",
+      "clients": "Happy Clients",
+      "years": "Years Experience",
+      "support": "Support"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "We provide complete web development solutions for your business needs."
+    },
+    "cta": {
+      "title": "Ready to Start Your Project?",
+      "subtitle": "Discuss your website needs with the ViviDev.id team today.",
+      "button": "Contact Us"
+    },
+    "pricing": {
+      "title": "Pricing Plans",
+      "subtitle": "Choose the plan that fits your business needs.",
+      "viewAll": "View All Plans",
+      "monthly": "/ month",
+      "free": "Free",
+      "popular": "Popular"
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About ViviDev.id",
+      "subtitle": "We are a professional web developer team dedicated to building the best digital solutions."
+    },
+    "story": {
+      "title": "Our Story",
+      "content": "ViviDev.id was founded with a simple mission: to help Indonesian businesses go digital with high-quality websites at affordable prices. and 5 yers Professional Team"
+    },
+    "values": {
+      "title": "Our Values",
+      "quality": "Quality",
+      "qualityDesc": "We are committed to delivering the best work in every project.",
+      "innovation": "Innovation",
+      "innovationDesc": "Always using the latest technology for optimal solutions.",
+      "integrity": "Integrity",
+      "integrityDesc": "Honest and transparent in every aspect of our work."
+    },
+    "team": {
+      "title": "Our Team"
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "Web Development Services",
+      "subtitle": "Complete solutions for your business digital needs."
+    }
+  },
+  "portfolio": {
+    "hero": {
+      "title": "Our Portfolio",
+      "subtitle": "See our best work in building professional websites."
+    },
+    "filter": {
+      "all": "All",
+      "company": "Company Profile",
+      "ecommerce": "E-Commerce",
+      "webapp": "Web App",
+      "landing": "Landing Page"
+    }
+  },
+  "blog": {
+    "hero": {
+      "title": "Blog & Articles",
+      "subtitle": "Tips, tutorials, and insights about web development."
+    },
+    "noPost": "No articles yet."
+  },
+  "contact": {
+    "hero": {
+      "title": "Contact Us",
+      "subtitle": "Have a question or want to discuss your project? We are here to help."
+    },
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number (optional)",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message",
+      "success": "Message sent successfully! We will contact you soon.",
+      "error": "Failed to send message. Please try again."
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "response": "We respond within 1 business day."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Pricing",
+      "subtitle": "Transparent and affordable web development packages for all business sizes."
+    }
+  }
+}

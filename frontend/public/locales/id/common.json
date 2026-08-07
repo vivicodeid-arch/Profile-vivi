@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "Beranda",
+    "about": "Tentang Kami",
+    "services": "Layanan",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Kontak"
+  },
+  "footer": {
+    "tagline": "Solusi web development profesional untuk bisnis Anda.",
+    "rights": "Hak cipta dilindungi.",
+    "links": "Tautan Cepat",
+    "contact": "Kontak"
+  },
+  "cta": {
+    "getStarted": "Mulai Sekarang",
+    "learnMore": "Jelajahi Layanan Web Development Kami",
+    "contactUs": "Hubungi Kami",
+    "viewPortfolio": "Lihat Portfolio",
+    "readMore": "Baca Artikel Lengkap",
+    "sendMessage": "Kirim Pesan",
+    "loading": "Memuat...",
+    "submit": "Kirim"
+  },
+  "whatsapp": {
+    "tooltip": "Chat via WhatsApp"
+  },
+  "language": {
+    "id": "Indonesia",
+    "en": "English"
+  }
+}

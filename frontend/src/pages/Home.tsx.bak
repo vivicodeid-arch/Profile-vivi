@@ -1,0 +1,176 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ArrowRight, Code2, Globe, Smartphone, Search, Wrench, Palette } from 'lucide-react';
+import { SEOHead } from '../components/seo/SEOHead';
+import { useSettingsStore } from '../store/settingsStore';
+import api from '../services/api';
+import type { Service } from '../types';
+
+const iconMap: Record<string, React.ElementType> = {
+  globe: Globe, code: Code2, palette: Palette,
+  search: Search, wrench: Wrench, smartphone: Smartphone,
+};
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'ViviDev.id',
+  url: 'https://vividev.id',
+  description: 'Jasa web developer profesional — website modern, cepat, dan SEO-friendly.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'ViviDev.id',
+    url: 'https://vividev.id',
+    contactPoint: { '@type': 'ContactPoint', telephone: '+62-857-9811-2370', contactType: 'customer service' },
+  },
+};
+
+export default function Home() {
+  const { t, i18n } = useTranslation(['common', 'pages']);
+  const lang = i18n.language as 'id' | 'en';
+  const [services, setServices] = useState<Service[]>([]);
+  const { settings } = useSettingsStore();
+
+  useEffect(() => {
+    api.get('/services').then(r => setServices(r.data.data || [])).catch(() => {});
+  }, []);
+
+  const stats = [
+    { value: '50+', label: t('home.stats.projects', { ns: 'pages' }) },
+    { value: '40+', label: t('home.stats.clients', { ns: 'pages' }) },
+    { value: '5+', label: t('home.stats.years', { ns: 'pages' }) },
+    { value: '24/7', label: t('home.stats.support', { ns: 'pages' }) },
+  ];
+
+  // Hero title dengan gradien biru pada kata kunci
+  const HeroTitle = () => {
+    if (lang === 'en') {
+      return (
+        <>
+          Build a{' '}
+          <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Professional
+          </span>{' '}
+          Website for Your Business
+        </>
+      );
+    }
+    return (
+      <>
+        Bangun Website{' '}
+        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          Profesional
+        </span>{' '}
+        untuk Bisnis Anda
+      </>
+    );
+  };
+
+  return (
+    <>
+      <SEOHead
+        title="ViviDev.id — Jasa Web Developer Profesional"
+        description="ViviDev.id menyediakan jasa pembuatan website profesional, aplikasi web, dan optimasi SEO untuk bisnis Anda."
+        canonical="/"
+        schema={orgSchema}
+      />
+
+      {/* Hero */}
+      <section className="relative min-h-screen flex items-center bg-gradient-to-br from-primary-900 to-primary-700 text-white pt-20 overflow-hidden">
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" aria-hidden="true" />
+        <div className="container-custom relative z-10 py-12 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column: Text */}
+            <div className="max-w-2xl">
+              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
+                <HeroTitle />
+              </h1>
+              <p className="text-lg lg:text-xl text-gray-300 leading-relaxed mb-10 max-w-xl">
+                {t('home.hero.subtitle', { ns: 'pages' })}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/services" className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-base px-8 py-4 rounded-full inline-flex items-center justify-center transition-colors w-fit">
+                  {t('nav.services', { ns: 'common' })}
+                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+            
+            {/* Right Column: Image Mockup */}
+            <div className="relative w-full flex justify-center lg:justify-end mt-10 lg:mt-0">
+              {/* Glow effect behind image */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-600/20 blur-[100px] rounded-full" />
+              <img 
+                src={settings.heroImageUrl || "/hero-mockup.png"} 
+                alt="Website Mockup on Phone and Laptop" 
+                className="relative z-10 w-full max-w-[650px] h-auto object-contain drop-shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="bg-white py-12 shadow-sm" aria-label="Statistics">
+        <div className="container-custom">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map(s => (
+              <div key={s.label} className="text-center">
+                <div className="text-4xl font-bold text-primary-600">{s.value}</div>
+                <div className="mt-1 text-sm text-gray-600">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Preview */}
+      <section className="section-padding bg-gray-50" aria-labelledby="services-heading">
+        <div className="container-custom">
+          <h2 id="services-heading" className="section-title">{t('home.services.title', { ns: 'pages' })}</h2>
+          <p className="section-subtitle">{t('home.services.subtitle', { ns: 'pages' })}</p>
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.slice(0, 6).map(service => {
+              const Icon = iconMap[service.icon] || Code2;
+              return (
+                <div key={service.id} className="card p-6">
+                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {(service.title as Record<string, string>)[lang]}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(service.description as Record<string, string>)[lang]}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-10 text-center">
+            <Link to="/services" className="btn-outline">
+              {t('cta.learnMore')} <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="section-padding bg-primary-700 text-white" aria-labelledby="cta-heading">
+        <div className="container-custom text-center">
+          <h2 id="cta-heading" className="text-3xl lg:text-4xl font-bold">
+            {t('home.cta.title', { ns: 'pages' })}
+          </h2>
+          <p className="mt-4 text-lg text-primary-200 max-w-xl mx-auto">
+            {t('home.cta.subtitle', { ns: 'pages' })}
+          </p>
+          <Link to="/contact" className="mt-8 inline-flex btn-primary bg-white text-primary-700 hover:bg-primary-50 text-base px-8 py-4">
+            {t('home.cta.button', { ns: 'pages' })}
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

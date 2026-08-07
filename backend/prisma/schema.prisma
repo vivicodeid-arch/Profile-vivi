@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       Json      // { id: string, en: string }
+  content     Json      // { id: string, en: string }
+  excerpt     Json      // { id: string, en: string }
+  metaTitle   Json      // { id: string, en: string }
+  metaDesc    Json      // { id: string, en: string }
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("posts")
+}
+
+model Portfolio {
+  id          String   @id @default(cuid())
+  slug        String   @unique @default("")
+  title       Json     // { id: string, en: string }
+  description Json     // { id: string, en: string }
+  category    String
+  imageUrl    String
+  projectUrl  String?
+  techStack   String[]
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("portfolios")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       Json     // { id: string, en: string }
+  description Json     // { id: string, en: string }
+  icon        String
+  imageUrl    String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("services")
+}
+
+model TeamMember {
+  id       String  @id @default(cuid())
+  name     String
+  role     Json    // { id: string, en: string }
+  bio      Json    // { id: string, en: string }
+  photo    String?
+  linkedIn String?
+  order    Int     @default(0)
+  active   Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("team_members")
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  content   Json     // { id: string, en: string }
+  rating    Int      @default(5)
+  photo     String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  ipAddress String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_submissions")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+  @@map("page_views")
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  mimeType  String
+  size      Int
+  url       String
+  alt       String?
+  createdAt DateTime @default(now())
+
+  @@map("media")
+}
+
+model Setting {
+  key   String @id
+  value String
+
+  @@map("settings")
+}
+
+model Partner {
+  id         String   @id @default(cuid())
+  name       String
+  logoUrl    String
+  websiteUrl String?
+  order      Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("partners")
+}
+
+model PricingPlan {
+  id           String           @id @default(cuid())
+  name         String
+  label        Json             // { id: string, en: string }
+  subtitle     Json             // { id: string, en: string }
+  category     String           @default("individual") // "individual" | "team"
+  priceMonthly Float?
+  priceYearly  Float?
+  currency     String           @default("IDR")
+  highlighted  Boolean          @default(false)
+  ctaLabel     Json             // { id: string, en: string }
+  ctaUrl       String?
+  badge        String?
+  active       Boolean          @default(true)
+  order        Int              @default(0)
+  features     PricingFeature[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@map("pricing_plans")
+}
+
+model PricingFeature {
+  id       String      @id @default(cuid())
+  planId   String
+  plan     PricingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  text     Json        // { id: string, en: string }
+  included Boolean     @default(true)
+  order    Int         @default(0)
+
+  @@map("pricing_features")
+}

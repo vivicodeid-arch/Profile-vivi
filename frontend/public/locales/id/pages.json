@@ -1,0 +1,109 @@
+{
+  "home": {
+    "hero": {
+      "title": "Bangun Website Profesional untuk Bisnis Anda",
+      "subtitle": "ViviDev.id hadir untuk mewujudkan ide digital Anda menjadi website yang modern, cepat, dan mudah ditemukan di Google.",
+      "cta": "Konsultasi Gratis",
+      "ctaSub": "Lihat Portfolio"
+    },
+    "stats": {
+      "projects": "Proyek Selesai",
+      "clients": "Klien Puas",
+      "years": "Tahun Pengalaman",
+      "support": "Dukungan"
+    },
+    "services": {
+      "title": "Layanan Kami",
+      "subtitle": "Kami menyediakan solusi web development lengkap untuk kebutuhan bisnis Anda."
+    },
+    "cta": {
+      "title": "Siap Memulai Proyek Anda?",
+      "subtitle": "Konsultasikan kebutuhan website Anda dengan tim ViviDev.id sekarang.",
+      "button": "Hubungi Kami"
+    },
+    "pricing": {
+      "title": "Paket Harga",
+      "subtitle": "Pilih paket yang sesuai kebutuhan bisnis Anda.",
+      "viewAll": "Lihat Semua Paket",
+      "monthly": "/ bulan",
+      "free": "Gratis",
+      "popular": "Populer"
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "Tentang ViviDev.id",
+      "subtitle": "Kami adalah tim web developer profesional yang berdedikasi membangun solusi digital terbaik."
+    },
+    "story": {
+      "title": "Cerita Kami",
+      "content": "ViviDev.id didirikan dengan misi sederhana: membantu bisnis Indonesia go digital dengan website berkualitas tinggi dan harga yang terjangkau. \nDan telah berdiri Sejak 2019 di Bandung , dengan team profesional"
+    },
+    "values": {
+      "title": "Nilai-Nilai Kami",
+      "quality": "Kualitas",
+      "qualityDesc": "Kami berkomitmen untuk menghasilkan karya terbaik di setiap proyek.",
+      "innovation": "Inovasi",
+      "innovationDesc": "Selalu menggunakan teknologi terkini untuk solusi yang optimal.",
+      "integrity": "Integritas",
+      "integrityDesc": "Jujur dan transparan dalam setiap aspek pekerjaan kami."
+    },
+    "team": {
+      "title": "Tim Kami"
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "Layanan Web Development",
+      "subtitle": "Solusi lengkap untuk kebutuhan digital bisnis Anda."
+    }
+  },
+  "portfolio": {
+    "hero": {
+      "title": "Portfolio Kami",
+      "subtitle": "Lihat hasil karya terbaik kami dalam membangun website profesional."
+    },
+    "filter": {
+      "all": "Semua",
+      "company": "Company Profile",
+      "ecommerce": "E-Commerce",
+      "webapp": "Web App",
+      "landing": "Landing Page"
+    }
+  },
+  "blog": {
+    "hero": {
+      "title": "Blog & Artikel",
+      "subtitle": "Tips, tutorial, dan insight seputar web development."
+    },
+    "noPost": "Belum ada artikel."
+  },
+  "contact": {
+    "hero": {
+      "title": "Hubungi Kami",
+      "subtitle": "Ada pertanyaan atau ingin berdiskusi tentang proyek Anda? Kami siap membantu."
+    },
+    "form": {
+      "name": "Nama Lengkap",
+      "email": "Alamat Email",
+      "phone": "Nomor Telepon (opsional)",
+      "subject": "Subjek",
+      "message": "Pesan",
+      "submit": "Kirim Pesan",
+      "success": "Pesan berhasil dikirim! Kami akan segera menghubungi Anda.",
+      "error": "Gagal mengirim pesan. Silakan coba lagi."
+    },
+    "info": {
+      "title": "Informasi Kontak",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "response": "Kami merespons dalam 1x24 jam kerja."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Harga Layanan",
+      "subtitle": "Paket layanan web development yang transparan dan terjangkau untuk semua skala bisnis."
+    }
+  }
+}
