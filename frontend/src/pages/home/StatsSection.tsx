@@ -46,7 +46,7 @@ export default function StatsSection() {
     <section
       ref={ref}
       className="py-16 border-b border-blue-100"
-      style={{ backgroundColor: '#BBDEFB' }}
+      style={{ backgroundColor: '#E3F2FD' }}
       aria-label="Statistik"
     >
       <div className="container-custom">
