@@ -88,7 +88,7 @@ export default function HeroSection() {
         Build a{' '}
         <span
           className="bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]"
-          style={{ backgroundImage: 'linear-gradient(90deg, #90CAF9, #2196F3, #E3F2FD, #2196F3, #90CAF9)' }}
+          style={{ backgroundImage: 'linear-gradient(90deg, #B8860B, #FFD700, #FFF8DC, #FFD700, #B8860B)' }}
         >
           Professional
         </span>{' '}
@@ -99,7 +99,7 @@ export default function HeroSection() {
         Bangun Website{' '}
         <span
           className="bg-clip-text text-transparent animate-shimmer bg-[length:200%_auto]"
-          style={{ backgroundImage: 'linear-gradient(90deg, #90CAF9, #2196F3, #E3F2FD, #2196F3, #90CAF9)' }}
+          style={{ backgroundImage: 'linear-gradient(90deg, #B8860B, #FFD700, #FFF8DC, #FFD700, #B8860B)' }}
         >
           Profesional
         </span>{' '}
