@@ -25,7 +25,7 @@ export default function Footer() {
   const address = settings.contactAddress || 'Indonesia';
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="text-gray-100" style={{ backgroundColor: '#0D47A1' }}>
       <div className="container-custom py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
