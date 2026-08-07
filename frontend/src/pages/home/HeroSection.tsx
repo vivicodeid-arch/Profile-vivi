@@ -84,10 +84,10 @@ export default function HeroSection() {
   });
 
   return (
-    <section className="relative min-h-screen flex items-center bg-[linear-gradient(135deg,_#0a0f1e_0%,_#0d1635_30%,_#111d4a_55%,_#0f1d3e_75%,_#080d1a_100%)] text-white pt-20 overflow-hidden">
-      {/* Radial glows */}
+    <section className="relative min-h-screen flex items-center bg-[linear-gradient(135deg,_#042f2e_0%,_#065f46_30%,_#0f766e_55%,_#134e4a_75%,_#021d1b_100%)] text-white pt-20 overflow-hidden">
+      {/* Radial glows — teal/emerald tone */}
       <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,_rgba(59,130,246,0.12)_0%,_transparent_60%),_radial-gradient(ellipse_at_80%_20%,_rgba(99,102,241,0.10)_0%,_transparent_55%),_radial-gradient(ellipse_at_60%_80%,_rgba(14,165,233,0.07)_0%,_transparent_50%)]"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,_rgba(20,184,166,0.15)_0%,_transparent_60%),_radial-gradient(ellipse_at_80%_20%,_rgba(16,185,129,0.12)_0%,_transparent_55%),_radial-gradient(ellipse_at_60%_80%,_rgba(6,182,212,0.08)_0%,_transparent_50%)]"
         aria-hidden="true"
       />
       <HeroParticles />
