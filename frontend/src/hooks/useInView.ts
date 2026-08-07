@@ -12,27 +12,29 @@ export function useInView(threshold = 0.1) {
     const el = ref.current;
     if (!el) return;
 
-    // Check immediately if element is already in viewport
-    const rect = el.getBoundingClientRect();
-    const alreadyVisible =
-      rect.top < window.innerHeight && rect.bottom > 0;
-    if (alreadyVisible) {
-      setInView(true);
-      return;
-    }
+    // Defer to after first paint so getBoundingClientRect is accurate
+    const raf = requestAnimationFrame(() => {
+      const rect = el.getBoundingClientRect();
+      const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+      if (alreadyVisible) {
+        setInView(true);
+        return;
+      }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold, rootMargin: '0px 0px -50px 0px' },
-    );
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setInView(true);
+            observer.disconnect();
+          }
+        },
+        { threshold, rootMargin: '0px 0px -50px 0px' },
+      );
 
-    observer.observe(el);
-    return () => observer.disconnect();
+      observer.observe(el);
+    });
+
+    return () => cancelAnimationFrame(raf);
   }, [threshold]);
 
   return { ref, inView };
