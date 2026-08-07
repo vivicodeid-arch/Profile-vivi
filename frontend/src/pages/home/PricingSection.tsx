@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Check, ArrowRight } from 'lucide-react';
+import { useInView } from '../../hooks/useInView';
 import type { PricingPlan } from '../../types';
 
 interface PricingSectionProps {
@@ -13,23 +14,35 @@ interface PricingSectionProps {
 export default function PricingSection({ plans }: PricingSectionProps) {
   const { t, i18n } = useTranslation(['pages']);
   const lang = i18n.language as 'id' | 'en';
+  const { ref, inView } = useInView(0.1);
   if (plans.length === 0) return null;
 
   return (
     <section
-      className="section-padding bg-white dark:bg-gray-900"
+      ref={ref}
+      className="section-padding bg-[#0f172a] text-white"
       aria-labelledby="pricing-heading"
     >
-      <div
-        className="container-custom"
-      >
-        <h2 id="pricing-heading" className="section-title">
-          {t('home.pricing.title')}
-        </h2>
-        <p className="section-subtitle">{t('home.pricing.subtitle')}</p>
+      <div className="container-custom">
+        <div
+          className="transition-all duration-700 text-center"
+          style={{
+            opacity:   inView ? 1 : 0,
+            transform: inView ? 'translateY(0)' : 'translateY(30px)',
+          }}
+        >
+          <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold">
+            {t('home.pricing.title')}
+          </h2>
+          <p className="mt-4 text-slate-400 max-w-2xl mx-auto">{t('home.pricing.subtitle')}</p>
+        </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.slice(0, 3).map(plan => {
+        <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-0 lg:[perspective:1200px] items-center max-w-6xl mx-auto">
+          {plans.slice(0, 3).map((plan, index) => {
+            const isCenter = index === 1;
+            const isLeft = index === 0;
+            const isRight = index === 2;
+            
             const price    = plan.priceMonthly;
             const priceStr =
               price === null ? null
@@ -40,61 +53,93 @@ export default function PricingSection({ plans }: PricingSectionProps) {
                   maximumFractionDigits: 0,
                 }).format(price);
 
+            // Based on the image, there's a discounted price look. We'll simulate it if highlighted.
+            const originalPriceStr = price ? new Intl.NumberFormat('id-ID', {
+                  style: 'currency',
+                  currency: plan.currency || 'IDR',
+                  maximumFractionDigits: 0,
+                }).format(price * 1.2) : null;
+
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-2xl p-6 border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
-                  plan.highlighted
-                    ? 'bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-600/30'
-                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                }`}
+                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-500 hover:z-20 
+                  bg-[#1e293b] border border-slate-700/50 
+                  ${isCenter ? 'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_10px_0_#020617] z-10 lg:scale-110 lg:-translate-y-4' : 'shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5),0_8px_0_#020617] z-0 lg:scale-95 opacity-90 hover:opacity-100'}
+                  ${isLeft ? 'lg:[transform:rotateY(15deg)] lg:origin-right' : ''}
+                  ${isRight ? 'lg:[transform:rotateY(-15deg)] lg:origin-left' : ''}
+                `}
               >
+                {/* Dashed red top border for center card */}
+                {isCenter && (
+                  <div className="absolute top-0 left-0 right-0 h-2 rounded-t-2xl overflow-hidden">
+                    <div className="w-full h-full" style={{ background: 'repeating-linear-gradient(45deg, #ef4444, #ef4444 10px, #ffffff 10px, #ffffff 20px)' }}></div>
+                  </div>
+                )}
+
+                {/* Badge */}
                 {plan.badge && (
                   <span
-                    className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold ${
-                      plan.highlighted ? 'bg-white text-primary-600' : 'bg-primary-600 text-white'
-                    }`}
+                    className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-lg
+                      ${plan.highlighted ? 'bg-red-500 text-white shadow-red-500/40' : 'bg-slate-700 text-slate-200'}
+                    `}
                   >
-                    {plan.badge}
+                    ★ {plan.badge}
                   </span>
                 )}
 
-                <h3 className={`text-lg font-bold ${plan.highlighted ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
-                  {plan.label[lang] || plan.label.id || plan.name}
-                </h3>
-                <p className={`text-sm mt-1 ${plan.highlighted ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                  {plan.subtitle[lang] || plan.subtitle.id}
-                </p>
-
                 <div className="mt-4">
+                  <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase">Company Profile</span>
+                  <h3 className="text-2xl font-bold text-white mt-1">
+                    {plan.label[lang] || plan.label.id || plan.name}
+                  </h3>
+                  <p className="text-xs mt-2 text-slate-400">
+                    {plan.subtitle[lang] || plan.subtitle.id}
+                  </p>
+                </div>
+
+                <div className="mt-6">
                   {priceStr ? (
-                    <>
-                      <span className={`text-3xl font-bold ${plan.highlighted ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
-                        {priceStr}
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm text-slate-400 line-through decoration-red-500">{originalPriceStr}</span>
+                        {plan.highlighted && (
+                          <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">POTONGAN SPESIAL</span>
+                        )}
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-bold text-white">
+                          {priceStr}
+                        </span>
+                      </div>
+                      <span className="text-xs italic text-slate-400 mt-2">
+                        Gratis domain (.com) & hosting tahun pertama
                       </span>
-                      <span className={`text-sm ml-1 ${plan.highlighted ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                        {t('home.pricing.monthly')}
-                      </span>
-                    </>
+                    </div>
                   ) : (
-                    <span className={`text-3xl font-bold ${plan.highlighted ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                    <span className="text-4xl font-bold text-white">
                       —
                     </span>
                   )}
                 </div>
 
-                <ul className="mt-4 space-y-2">
-                  {plan.features.slice(0, 4).map(f => (
-                    <li key={f.id} className="flex items-center gap-2 text-sm">
-                      <Check
-                        className={`w-4 h-4 shrink-0 ${
-                          f.included
-                            ? plan.highlighted ? 'text-white' : 'text-primary-600 dark:text-primary-400'
-                            : 'text-gray-300 dark:text-gray-600'
-                        }`}
-                        aria-hidden="true"
-                      />
-                      <span className={f.included ? (plan.highlighted ? 'text-white' : 'text-gray-700 dark:text-gray-300') : 'text-gray-400 line-through'}>
+                <hr className="border-slate-700 my-6" />
+
+                <p className="text-sm text-slate-300 mb-4 h-10">
+                  {plan.highlighted 
+                    ? "Untuk bisnis yang ingin kelola konten sendiri — panel admin, training, dan marketing digital terintegrasi." 
+                    : "Solusi lengkap untuk perusahaan besar yang membutuhkan website premium & performa tinggi."}
+                </p>
+
+                <ul className="flex-1 space-y-3 mb-8">
+                  {plan.features.slice(0, 7).map(f => (
+                    <li key={f.id} className="flex items-start gap-3 text-sm">
+                      {f.included ? (
+                        <Check className="w-5 h-5 shrink-0 text-cyan-400 mt-0.5" aria-hidden="true" />
+                      ) : (
+                        <span className="w-5 h-5 shrink-0 text-red-500 flex items-center justify-center font-bold mt-0.5">✕</span>
+                      )}
+                      <span className={f.included ? 'text-slate-200' : 'text-slate-500'}>
                         {f.text[lang] || f.text.id}
                       </span>
                     </li>
@@ -103,23 +148,23 @@ export default function PricingSection({ plans }: PricingSectionProps) {
 
                 <Link
                   to={plan.ctaUrl || '/pricing'}
-                  className={`mt-6 block text-center py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 ${
-                    plan.highlighted
-                      ? 'bg-white text-primary-600 hover:bg-primary-50'
-                      : 'bg-primary-600 text-white hover:bg-primary-500'
+                  className={`mt-auto block text-center py-3 px-6 rounded-full text-sm font-bold transition-all duration-200 ${
+                    isCenter
+                      ? 'bg-white text-slate-900 hover:bg-slate-100 shadow-[0_0_15px_rgba(255,255,255,0.3)]'
+                      : 'bg-slate-700/50 text-white hover:bg-slate-700 border border-slate-600'
                   }`}
                 >
-                  {plan.ctaLabel[lang] || plan.ctaLabel.id || 'Pilih Paket'}
+                  {plan.ctaLabel[lang] || plan.ctaLabel.id || 'Pilih Paket ini'}
                 </Link>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-10 text-center">
+        <div className="mt-16 text-center">
           <Link
             to="/pricing"
-            className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-medium hover:underline"
+            className="inline-flex items-center gap-2 text-cyan-400 font-medium hover:text-cyan-300 transition-colors"
           >
             {t('home.pricing.viewAll')}
             <ArrowRight className="w-4 h-4" aria-hidden="true" />

@@ -5,6 +5,7 @@ import StatsSection from './home/StatsSection';
 import AboutSection from './home/AboutSection';
 import ServicesSection from './home/ServicesSection';
 import PricingSection from './home/PricingSection';
+import WorkProcessSection from './home/WorkProcessSection';
 import CtaSection from './home/CtaSection';
 import { useApi } from '../hooks/useApi';
 import type { Service, PricingPlan } from '../types';
@@ -46,6 +47,7 @@ export default function Home() {
       <ServicesSection services={services ?? []} />
       <AboutSection />
       <PricingSection plans={plans ?? []} />
+      <WorkProcessSection />
       <PartnersSection />
       <CtaSection />
     </>

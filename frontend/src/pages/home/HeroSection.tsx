@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Code2, Zap, Globe } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useTilt } from '../../hooks/useTilt';
 
 // ---------------------------------------------------------------------------
 // Particles — floating dots dalam palet biru
@@ -69,16 +70,17 @@ export default function HeroSection() {
   const lang = i18n.language as 'id' | 'en';
   const { settings } = useSettingsStore();
   const [visible, setVisible] = useState(false);
+  const heroTilt = useTilt<HTMLDivElement>({ maxRotate: 15, scale: 1.04, perspective: 800 });
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 80);
+    const timer = setTimeout(() => setVisible(true), 300);
     return () => clearTimeout(timer);
   }, []);
 
   const fadeIn = (delay: string): React.CSSProperties => ({
     opacity:         visible ? 1 : 0,
-    transform:       visible ? 'translateY(0)' : 'translateY(28px)',
-    transition:      'opacity 700ms, transform 700ms',
+    transform:       visible ? 'translateY(0)' : 'translateY(36px)',
+    transition:      'opacity 1000ms, transform 1000ms',
     transitionDelay: delay,
   });
 
@@ -169,7 +171,7 @@ export default function HeroSection() {
             {/* H1 */}
             <h1
               className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6"
-              style={fadeIn('120ms')}
+              style={fadeIn('200ms')}
             >
               {heroTitle}
             </h1>
@@ -177,7 +179,7 @@ export default function HeroSection() {
             {/* Subtitle */}
             <p
               className="text-lg lg:text-xl leading-relaxed mb-8 max-w-xl"
-              style={{ ...fadeIn('240ms'), color: '#90CAF9' }}
+              style={{ ...fadeIn('400ms'), color: '#90CAF9' }}
             >
               {t('home.hero.subtitle', { ns: 'pages' })}
             </p>
@@ -185,7 +187,7 @@ export default function HeroSection() {
             {/* Feature pills */}
             <div
               className="flex flex-wrap gap-3 mb-10"
-              style={fadeIn('300ms')}
+              style={fadeIn('600ms')}
             >
               {FEATURES.map(({ icon: Icon, label }) => (
                 <div
@@ -204,7 +206,7 @@ export default function HeroSection() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4" style={fadeIn('360ms')}>
+            <div className="flex flex-col sm:flex-row gap-4" style={fadeIn('800ms')}>
               <Link
                 to="/services"
                 className="font-semibold text-base px-8 py-4 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 hover:shadow-lg w-fit"
@@ -276,11 +278,18 @@ export default function HeroSection() {
               aria-hidden="true"
             />
 
-            <img
-              src={settings.heroImageUrl || '/hero-mockup.png'}
-              alt="Website Mockup"
-              className="relative z-10 w-full max-w-[560px] h-auto object-contain drop-shadow-2xl animate-float"
-            />
+            <div
+              ref={heroTilt.ref}
+              onMouseMove={heroTilt.onMouseMove}
+              onMouseLeave={heroTilt.onMouseLeave}
+              style={{ transformStyle: 'preserve-3d', willChange: 'transform', display: 'inline-block' }}
+            >
+              <img
+                src={settings.heroImageUrl || '/hero-mockup.png'}
+                alt="Website Mockup"
+                className="relative z-10 w-full max-w-[560px] h-auto object-contain drop-shadow-2xl"
+              />
+            </div>
           </div>
         </div>
       </div>

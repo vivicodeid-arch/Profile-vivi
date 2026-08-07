@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 /**
  * Fires once when the element enters the viewport.
- * Disconnects the observer after first intersection (trigger-once semantics).
+ * - Elements already fully above the fold (like HeroSection) fire immediately.
+ * - Elements below the fold fire when they reach the middle 30% of the viewport.
  */
 export function useInView(threshold = 0.1) {
   const ref = useRef<HTMLElement>(null);
@@ -12,11 +13,11 @@ export function useInView(threshold = 0.1) {
     const el = ref.current;
     if (!el) return;
 
-    // Defer to after first paint so getBoundingClientRect is accurate
     const raf = requestAnimationFrame(() => {
       const rect = el.getBoundingClientRect();
-      const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
-      if (alreadyVisible) {
+      // If element is already fully above mid-viewport (i.e. it's the hero), show immediately
+      const aboveFold = rect.bottom < window.innerHeight * 0.5;
+      if (aboveFold) {
         setInView(true);
         return;
       }
@@ -28,7 +29,8 @@ export function useInView(threshold = 0.1) {
             observer.disconnect();
           }
         },
-        { threshold, rootMargin: '0px 0px -50px 0px' },
+        // trigger when element reaches the middle 30% of the viewport
+        { threshold, rootMargin: '0px 0px -30% 0px' },
       );
 
       observer.observe(el);

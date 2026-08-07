@@ -105,6 +105,8 @@
       "subtitle": "Tips, tutorial, dan insight seputar web development."
     },
     "noPost": "Belum ada artikel.",
+    "empty": "Belum ada artikel.",
+    "readMore": "Baca Selengkapnya",
     "backToList": "Kembali ke Blog",
     "cta": {
       "title": "Siap Membangun Website Profesional?",
@@ -122,6 +124,7 @@
       "subtitle": "Ada pertanyaan atau ingin berdiskusi tentang proyek Anda? Kami siap membantu."
     },
     "form": {
+      "title": "Kirim Pesan",
       "name": "Nama Lengkap",
       "email": "Alamat Email",
       "phone": "Nomor Telepon (opsional)",
@@ -129,10 +132,14 @@
       "message": "Pesan",
       "submit": "Kirim Pesan",
       "success": "Pesan berhasil dikirim! Kami akan segera menghubungi Anda.",
+      "successTitle": "Pesan Terkirim!",
+      "successBody": "Terima kasih! Kami akan segera menghubungi Anda dalam 1x24 jam kerja.",
+      "sendAnother": "Kirim Pesan Lain",
       "error": "Gagal mengirim pesan. Silakan coba lagi."
     },
     "info": {
       "title": "Informasi Kontak",
+      "body": "Hubungi kami melalui salah satu saluran berikut. Kami siap membantu kebutuhan digital Anda.",
       "email": "Email",
       "whatsapp": "WhatsApp",
       "response": "Kami merespons dalam 1x24 jam kerja."
