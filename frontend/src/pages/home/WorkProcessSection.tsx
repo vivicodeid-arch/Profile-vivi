@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useInView } from '../../hooks/useInView';
 
 export interface WorkProcessStep {
@@ -47,7 +46,6 @@ const defaultSteps: WorkProcessStep[] = [
 ];
 
 export default function WorkProcessSection({ steps = defaultSteps }: WorkProcessSectionProps) {
-  const { t } = useTranslation(['pages']);
   const { ref, inView } = useInView(0.1);
 
   return (
