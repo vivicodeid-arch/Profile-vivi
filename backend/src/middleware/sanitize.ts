@@ -1,22 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 
 /**
- * Recursively sanitize string values in an object
- * Removes HTML tags and trims whitespace
+ * Fields that are allowed to contain HTML content (e.g. rich-text blog editor).
+ * These keys are excluded from HTML-stripping sanitization.
  */
-const sanitizeValue = (value: unknown): unknown => {
+const HTML_ALLOWED_FIELDS = new Set(['content', 'body', 'html', 'excerpt']);
+
+/**
+ * Recursively sanitize string values in an object.
+ * - Always strips <script> tags from every field.
+ * - Strips all other HTML tags ONLY for fields not in HTML_ALLOWED_FIELDS.
+ */
+const sanitizeValue = (value: unknown, key?: string): unknown => {
   if (typeof value === 'string') {
-    return value
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<[^>]+>/g, '')
-      .trim();
+    // Always remove script tags — no exception
+    let sanitized = value.replace(
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+      '',
+    );
+    // Strip remaining HTML only for non-rich-text fields
+    if (!key || !HTML_ALLOWED_FIELDS.has(key)) {
+      sanitized = sanitized.replace(/<[^>]+>/g, '');
+    }
+    return sanitized.trim();
   }
   if (Array.isArray(value)) {
-    return value.map(sanitizeValue);
+    return value.map((item) => sanitizeValue(item, key));
   }
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [k, sanitizeValue(v)])
+      Object.entries(value).map(([k, v]) => [k, sanitizeValue(v, k)]),
     );
   }
   return value;

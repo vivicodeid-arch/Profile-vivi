@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Code2, LayoutDashboard, FileText, Briefcase, Settings as SettingsIcon, Sliders, Users, Image as ImageIcon, LogOut, Menu, X, Handshake, Tag, Info } from 'lucide-react';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '../store/authStore';
 
 const navItems = [
@@ -35,6 +36,9 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-200 lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">

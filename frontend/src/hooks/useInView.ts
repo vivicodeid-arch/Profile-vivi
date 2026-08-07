@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * Fires once when the element enters the viewport.
+ * Disconnects the observer after first intersection (trigger-once semantics).
+ */
 export function useInView(threshold = 0.15) {
   const ref = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
@@ -12,10 +16,10 @@ export function useInView(threshold = 0.15) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          observer.disconnect(); // trigger once
+          observer.disconnect();
         }
       },
-      { threshold }
+      { threshold },
     );
 
     observer.observe(el);
@@ -25,22 +29,29 @@ export function useInView(threshold = 0.15) {
   return { ref, inView };
 }
 
+/**
+ * Animates a number from 0 to `target` over `duration` ms,
+ * starting only when `inView` becomes true.
+ */
 export function useCountUp(target: number, inView: boolean, duration = 1800) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const step = target / (duration / 16);
+
+    let current = 0;
+    const step   = target / (duration / 16);
+
     const timer = setInterval(() => {
-      start += step;
-      if (start >= target) {
+      current += step;
+      if (current >= target) {
         setCount(target);
         clearInterval(timer);
       } else {
-        setCount(Math.floor(start));
+        setCount(Math.floor(current));
       }
     }, 16);
+
     return () => clearInterval(timer);
   }, [inView, target, duration]);
 

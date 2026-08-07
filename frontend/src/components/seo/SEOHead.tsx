@@ -25,20 +25,26 @@ export const SEOHead = ({
 }: SEOHeadProps) => {
   const { i18n } = useTranslation();
   const lang = i18n.language || 'id';
-  const altLang = lang === 'id' ? 'en' : 'id';
   const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : BASE_URL;
+  // Hreflang: point each language variant to its own URL with ?lang= param,
+  // so Google understands these are separate language versions.
+  const idUrl = canonical ? `${BASE_URL}${canonical}?lang=id` : `${BASE_URL}/?lang=id`;
+  const enUrl = canonical ? `${BASE_URL}${canonical}?lang=en` : `${BASE_URL}/?lang=en`;
 
   return (
     <Helmet>
       <html lang={lang} />
       <title>{title}</title>
       <meta name="description" content={description} />
-      {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      {noIndex
+        ? <meta name="robots" content="noindex, nofollow" />
+        : <meta name="robots" content="index, follow" />
+      }
       <link rel="canonical" href={canonicalUrl} />
 
-      {/* Hreflang */}
-      <link rel="alternate" hrefLang={lang} href={canonicalUrl} />
-      <link rel="alternate" hrefLang={altLang} href={canonicalUrl} />
+      {/* Hreflang — each language points to a distinct URL */}
+      <link rel="alternate" hrefLang="id" href={idUrl} />
+      <link rel="alternate" hrefLang="en" href={enUrl} />
       <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
 
       {/* Open Graph */}

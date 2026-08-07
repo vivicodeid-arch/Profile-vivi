@@ -1,3 +1,8 @@
+// ---------------------------------------------------------------------------
+// Shared domain types
+// ---------------------------------------------------------------------------
+
+/** A text field that has both an Indonesian and English value. */
 export interface BilingualText {
   id: string;
   en: string;
@@ -52,6 +57,46 @@ export interface TeamMember {
   order: number;
 }
 
+export interface Partner {
+  id: string;
+  name: string;
+  logoUrl: string;
+  websiteUrl?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Pricing
+// ---------------------------------------------------------------------------
+
+export interface PricingFeature {
+  id: string;
+  text: Record<string, string>;
+  included: boolean;
+  order: number;
+}
+
+export interface PricingPlan {
+  id: string;
+  name: string;
+  label: Record<string, string>;
+  subtitle: Record<string, string>;
+  category: string;
+  priceMonthly: number | null;
+  priceYearly: number | null;
+  currency: string;
+  highlighted: boolean;
+  ctaLabel: Record<string, string>;
+  ctaUrl: string | null;
+  badge: string | null;
+  active: boolean;
+  order: number;
+  features: PricingFeature[];
+}
+
+// ---------------------------------------------------------------------------
+// Contact
+// ---------------------------------------------------------------------------
+
 export interface ContactFormData {
   name: string;
   email: string;
@@ -67,6 +112,10 @@ export interface ContactSubmission extends ContactFormData {
   createdAt: string;
 }
 
+// ---------------------------------------------------------------------------
+// SEO
+// ---------------------------------------------------------------------------
+
 export interface PageMeta {
   title: string;
   description: string;
@@ -74,6 +123,10 @@ export interface PageMeta {
   ogImage?: string;
   ogType?: string;
 }
+
+// ---------------------------------------------------------------------------
+// API response wrappers
+// ---------------------------------------------------------------------------
 
 export interface ApiResponse<T> {
   status: 'ok' | 'error';
@@ -89,6 +142,10 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     pages: number;
   };
 }
+
+// ---------------------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------------------
 
 export interface AnalyticsSummary {
   pageViews: { today: number; last7Days: number; last30Days: number };

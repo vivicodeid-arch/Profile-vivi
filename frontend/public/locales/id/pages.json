@@ -31,6 +31,10 @@
     }
   },
   "about": {
+    "meta": {
+      "title": "Tentang Kami — ViviDev.id | Jasa Web Developer Profesional",
+      "description": "Kenali tim ViviDev.id — jasa web developer profesional asal Bandung yang telah membantu bisnis Indonesia go digital sejak 2019."
+    },
     "hero": {
       "title": "Tentang ViviDev.id",
       "subtitle": "Kami adalah tim web developer profesional yang berdedikasi membangun solusi digital terbaik."
@@ -53,12 +57,20 @@
     }
   },
   "services": {
+    "meta": {
+      "title": "Layanan Web Development — ViviDev.id | Website Profesional",
+      "description": "Kami menawarkan jasa pembuatan website profesional, company profile, toko online, landing page, dan aplikasi web untuk bisnis Anda."
+    },
     "hero": {
       "title": "Layanan Web Development",
       "subtitle": "Solusi lengkap untuk kebutuhan digital bisnis Anda."
     }
   },
   "portfolio": {
+    "meta": {
+      "title": "Portfolio — ViviDev.id | Proyek Web Development Kami",
+      "description": "Lihat portfolio ViviDev.id — company profile, toko online, web app, dan landing page yang telah kami bangun untuk bisnis Indonesia."
+    },
     "hero": {
       "title": "Portfolio Kami",
       "subtitle": "Lihat hasil karya terbaik kami dalam membangun website profesional."
@@ -72,6 +84,10 @@
     }
   },
   "blog": {
+    "meta": {
+      "title": "Blog & Artikel — ViviDev.id | Tips Web Development",
+      "description": "Baca artikel dan tips seputar web development, SEO, desain website, dan teknologi digital dari tim ViviDev.id."
+    },
     "hero": {
       "title": "Blog & Artikel",
       "subtitle": "Tips, tutorial, dan insight seputar web development."
@@ -79,6 +95,10 @@
     "noPost": "Belum ada artikel."
   },
   "contact": {
+    "meta": {
+      "title": "Hubungi Kami — ViviDev.id | Konsultasi Website Gratis",
+      "description": "Hubungi ViviDev.id untuk konsultasi website gratis. Tersedia via WhatsApp, email, atau form kontak — kami merespons dalam 1x24 jam kerja."
+    },
     "hero": {
       "title": "Hubungi Kami",
       "subtitle": "Ada pertanyaan atau ingin berdiskusi tentang proyek Anda? Kami siap membantu."
@@ -101,6 +121,10 @@
     }
   },
   "pricing": {
+    "meta": {
+      "title": "Harga Layanan — ViviDev.id | Paket Website Terjangkau",
+      "description": "Lihat paket harga ViviDev.id yang transparan untuk pembuatan website — dari proyek personal hingga skala enterprise. Nilai terbaik untuk anggaran Anda."
+    },
     "hero": {
       "title": "Harga Layanan",
       "subtitle": "Paket layanan web development yang transparan dan terjangkau untuk semua skala bisnis."

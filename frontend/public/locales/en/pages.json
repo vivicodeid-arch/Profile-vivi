@@ -31,6 +31,10 @@
     }
   },
   "about": {
+    "meta": {
+      "title": "About Us — ViviDev.id | Professional Web Developer",
+      "description": "Meet the ViviDev.id team — a professional web development agency from Bandung helping Indonesian businesses go digital since 2019."
+    },
     "hero": {
       "title": "About ViviDev.id",
       "subtitle": "We are a professional web developer team dedicated to building the best digital solutions."
@@ -53,12 +57,20 @@
     }
   },
   "services": {
+    "meta": {
+      "title": "Web Development Services — ViviDev.id | Professional Websites",
+      "description": "We offer professional website creation services including company profiles, online stores, landing pages, and web applications for your business."
+    },
     "hero": {
       "title": "Web Development Services",
       "subtitle": "Complete solutions for your business digital needs."
     }
   },
   "portfolio": {
+    "meta": {
+      "title": "Portfolio — ViviDev.id | Our Web Development Projects",
+      "description": "Browse ViviDev.id's portfolio of professional websites — company profiles, e-commerce, web apps, and landing pages built for Indonesian businesses."
+    },
     "hero": {
       "title": "Our Portfolio",
       "subtitle": "See our best work in building professional websites."
@@ -72,6 +84,10 @@
     }
   },
   "blog": {
+    "meta": {
+      "title": "Blog & Articles — ViviDev.id | Web Development Tips",
+      "description": "Read articles and tips on web development, SEO, website design, and digital technology from the ViviDev.id team."
+    },
     "hero": {
       "title": "Blog & Articles",
       "subtitle": "Tips, tutorials, and insights about web development."
@@ -79,6 +95,10 @@
     "noPost": "No articles yet."
   },
   "contact": {
+    "meta": {
+      "title": "Contact Us — ViviDev.id | Get a Free Web Consultation",
+      "description": "Contact ViviDev.id for a free website consultation. Reach us via WhatsApp, email, or our contact form — we respond within 1 business day."
+    },
     "hero": {
       "title": "Contact Us",
       "subtitle": "Have a question or want to discuss your project? We are here to help."
@@ -101,6 +121,10 @@
     }
   },
   "pricing": {
+    "meta": {
+      "title": "Pricing — ViviDev.id | Affordable Website Development Packages",
+      "description": "Explore ViviDev.id's transparent pricing plans for website development — from personal projects to enterprise solutions. Get the best value for your budget."
+    },
     "hero": {
       "title": "Pricing",
       "subtitle": "Transparent and affordable web development packages for all business sizes."

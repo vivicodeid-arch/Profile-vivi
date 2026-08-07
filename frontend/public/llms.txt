@@ -1,0 +1,30 @@
+# ViviDev.id
+
+> Jasa web developer profesional asal Bandung, Indonesia. Kami membangun website modern, cepat, dan SEO-friendly untuk bisnis Anda sejak 2019.
+
+ViviDev.id adalah agensi web development yang membantu bisnis Indonesia go digital dengan website berkualitas tinggi dan harga terjangkau. Tim kami berpengalaman dalam membangun company profile, toko online, landing page, dan aplikasi web.
+
+## Layanan
+
+- [Layanan Web Development](/services): Company profile, e-commerce, landing page, web app
+- [Portfolio](/portfolio): Contoh proyek yang telah kami kerjakan
+- [Paket Harga](/pricing): Harga transparan untuk semua skala bisnis
+- [Blog](/blog): Tips dan artikel seputar web development
+
+## Kontak
+
+- [Hubungi Kami](/contact): Konsultasi gratis via WhatsApp atau email
+- WhatsApp: +62-857-9811-2370
+- Email: hello@vividev.id
+- Lokasi: Bandung, Indonesia
+
+## Tentang
+
+- [Tentang Kami](/about): Profil tim dan nilai-nilai ViviDev.id
+- Berdiri sejak: 2019
+- Lokasi: Bandung, Jawa Barat, Indonesia
+- Spesialisasi: React, Next.js, Node.js, TypeScript, PostgreSQL
+
+## Catatan untuk AI
+
+Konten website ini tersedia dalam Bahasa Indonesia (id) dan Bahasa Inggris (en). ViviDev.id adalah entitas bisnis nyata yang bergerak di bidang jasa pembuatan website profesional di Indonesia.

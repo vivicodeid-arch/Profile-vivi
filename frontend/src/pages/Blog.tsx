@@ -1,177 +1,162 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { Calendar, ArrowRight } from "lucide-react";
-import { SEOHead } from "../components/seo/SEOHead";
-import { useSettingsStore } from "../store/settingsStore";
-import api from "../services/api";
-import type { Post } from "../types";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Calendar, ArrowRight } from 'lucide-react';
+import { SEOHead } from '../components/seo/SEOHead';
+import PageHero from '../components/ui/PageHero';
+import Spinner from '../components/ui/Spinner';
+import ErrorAlert from '../components/ui/ErrorAlert';
+import { useApi } from '../hooks/useApi';
+import type { Post } from '../types';
+import { SITE_NAME, SITE_URL } from '../lib/constants';
 
-const POSITION_CSS: Record<string, string> = {
-  "top-left":     "top left",
-  "top":          "top center",
-  "top-right":    "top right",
-  "left":         "center left",
-  "center":       "center center",
-  "right":        "center right",
-  "bottom-left":  "bottom left",
-  "bottom":       "bottom center",
-  "bottom-right": "bottom right",
-};
+function buildBlogSchema(posts: Post[], lang: 'id' | 'en') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: lang === 'id' ? `Blog — ${SITE_NAME}` : `Blog — ${SITE_NAME}`,
+    url: `${SITE_URL}/blog`,
+    description: lang === 'id'
+      ? 'Tips, tutorial, dan insight seputar web development dari tim ViviDev.id.'
+      : 'Tips, tutorials, and insights about web development from the ViviDev.id team.',
+    blogPost: posts.slice(0, 10).map(post => ({
+      '@type': 'BlogPosting',
+      headline: post.title[lang],
+      description: post.excerpt?.[lang] ?? '',
+      url: `${SITE_URL}/blog/${post.slug}`,
+      datePublished: post.publishedAt || post.createdAt,
+      dateModified: post.updatedAt || post.createdAt,
+      image: post.coverImage ?? undefined,
+      author: { '@type': 'Organization', name: SITE_NAME },
+    })),
+  };
+}
 
-function BlogHero() {
-  const { settings } = useSettingsStore();
-  const { t } = useTranslation(["pages"]);
-  const heroType = settings.blogHeroType || "gradient";
-  const heroUrl  = settings.blogHeroUrl  || "";
-  const title    = settings.blogHeroTitle    || t("blog.hero.title");
-  const subtitle = settings.blogHeroSubtitle || t("blog.hero.subtitle");
-  const position = POSITION_CSS[settings.blogHeroPosition || "center"] || "center center";
 
-  if (heroType === "image" && heroUrl) {
-    return (
-      <section className="relative pt-32 pb-16 text-white overflow-hidden min-h-[220px]">
-        <div
-          className="absolute inset-0 bg-cover"
-          style={{ backgroundImage: `url(${heroUrl})`, backgroundPosition: position }}
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-        <div className="container-custom relative z-10">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
-          <p className="text-lg text-white/80 max-w-2xl">{subtitle}</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (heroType === "video" && heroUrl) {
-    return (
-      <section className="relative pt-32 pb-16 text-white overflow-hidden min-h-[220px]">
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: position }}
-          src={heroUrl}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-        <div className="container-custom relative z-10">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
-          <p className="text-lg text-white/80 max-w-2xl">{subtitle}</p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="pt-32 pb-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="container-custom">
-        <h1 className="text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
-        <p className="text-lg text-gray-300 max-w-2xl">{subtitle}</p>
-      </div>
-    </section>
-  );
+interface PostsResponse {
+  data: Post[];
+  meta: { page: number; limit: number; total: number; pages: number };
 }
 
 export default function Blog() {
-  const { t, i18n } = useTranslation(["common", "pages"]);
-  const lang = i18n.language as "id" | "en";
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [meta, setMeta] = useState({ page: 1, pages: 1 });
+  const { t, i18n } = useTranslation(['pages', 'common']);
+  const lang = i18n.language as 'id' | 'en';
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    api.get(`/blog?page=${page}&limit=9`)
-      .then(r => { setPosts(r.data.data || []); setMeta(r.data.meta); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [page]);
+  const { data: response, isLoading, error } = useApi<PostsResponse>(
+    `/blog?page=${page}&limit=9`,
+  );
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    name: "Blog ViviDev.id",
-    url: "https://vividev.id/blog",
-    description: "Tips, tutorial, dan insight seputar web development.",
-    publisher: { "@type": "Organization", name: "ViviDev.id", url: "https://vividev.id" },
-  };
+  const posts = response?.data ?? [];
+  const meta  = response?.meta;
+
+  const schema = posts.length > 0 ? buildBlogSchema(posts, lang) : undefined;
 
   return (
     <>
       <SEOHead
-        title={t("blog.hero.title", { ns: "pages" })}
-        description={t("blog.hero.subtitle", { ns: "pages" })}
+        title={t('blog.meta.title')}
+        description={t('blog.meta.description')}
         canonical="/blog"
         schema={schema}
       />
 
-      <BlogHero />
+      <PageHero
+        page="blog"
+        titleKey="blog.hero.title"
+        subtitleKey="blog.hero.subtitle"
+      />
 
-      <section className="section-padding bg-gray-50 dark:bg-gray-950">
+      <section className="section-padding bg-white dark:bg-gray-900">
         <div className="container-custom">
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
-            </div>
-          ) : posts.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400 py-20">{t("blog.noPost", { ns: "pages" })}</p>
-          ) : (
+          {isLoading && <Spinner />}
+
+          {error && <ErrorAlert message={error} />}
+
+          {!isLoading && !error && posts.length === 0 && (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-16">
+              {t('blog.empty', { ns: 'pages' })}
+            </p>
+          )}
+
+          {posts.length > 0 && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {posts.map(post => (
-                  <article key={post.id} className="card group overflow-hidden flex flex-col">
-                    {post.coverImage && (
-                      <div className="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-700">
-                        <img
-                          src={post.coverImage}
-                          alt={(post.title as any)[lang] || ""}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    )}
-                    <div className="p-6 flex flex-col flex-1">
-                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
-                        <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                        <time dateTime={post.publishedAt || post.createdAt}>
-                          {new Date(post.publishedAt || post.createdAt).toLocaleDateString(lang === "id" ? "id-ID" : "en-US", { year: "numeric", month: "long", day: "numeric" })}
-                        </time>
-                      </div>
-                      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
-                        {(post.title as any)[lang]}
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 flex-1">
-                        {(post.excerpt as any)[lang]}
-                      </p>
-                      <div className="mt-4">
-                        <Link to={`/blog/${post.slug}`}
-                          className="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                          {t("cta.readMore")} <ArrowRight className="ml-1 w-4 h-4" aria-hidden="true" />
+                {posts.map(post => {
+                  const title   = post.title[lang];
+                  const excerpt = post.excerpt[lang];
+                  const date    = new Date(post.publishedAt || post.createdAt);
+
+                  return (
+                    <article
+                      key={post.id}
+                      className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      {post.coverImage && (
+                        <Link to={`/blog/${post.slug}`} tabIndex={-1} aria-hidden="true">
+                          <img
+                            src={post.coverImage}
+                            alt={title}
+                            className="w-full h-48 object-cover"
+                            loading="lazy"
+                          />
+                        </Link>
+                      )}
+
+                      <div className="p-6">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                          <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                          <time dateTime={date.toISOString()}>
+                            {date.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {
+                              year: 'numeric', month: 'long', day: 'numeric',
+                            })}
+                          </time>
+                        </div>
+
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                          <Link
+                            to={`/blog/${post.slug}`}
+                            className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                          >
+                            {title}
+                          </Link>
+                        </h2>
+
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
+                          {excerpt}
+                        </p>
+
+                        <Link
+                          to={`/blog/${post.slug}`}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 hover:gap-2.5 transition-all"
+                        >
+                          {t('blog.readMore', { ns: 'pages' })}
+                          <ArrowRight className="w-4 h-4" aria-hidden="true" />
                         </Link>
                       </div>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  );
+                })}
               </div>
 
-              {meta.pages > 1 && (
-                <div className="mt-12 flex justify-center gap-2">
+              {/* Pagination */}
+              {meta && meta.pages > 1 && (
+                <nav className="mt-12 flex justify-center gap-2" aria-label="Pagination">
                   {Array.from({ length: meta.pages }, (_, i) => i + 1).map(p => (
-                    <button key={p} onClick={() => setPage(p)}
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      aria-current={p === page ? 'page' : undefined}
                       className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                         p === page
-                          ? "bg-primary-600 text-white"
-                          : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                      }`}>
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                      }`}
+                    >
                       {p}
                     </button>
                   ))}
-                </div>
+                </nav>
               )}
             </>
           )}

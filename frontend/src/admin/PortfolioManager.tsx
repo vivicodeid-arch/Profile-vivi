@@ -1,302 +1,391 @@
-import { useEffect, useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, X, Save, Star, Upload, Image as ImageIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, X, Save, Star } from 'lucide-react';
 import api from '../services/api';
 import type { Portfolio } from '../types';
+import LangTabs from '../components/admin/LangTabs';
+import ImageUploadField from '../components/admin/ImageUploadField';
+import ErrorAlert from '../components/ui/ErrorAlert';
 
-const empty = {
-  title: { id: '', en: '' }, description: { id: '', en: '' },
-  category: 'company', imageUrl: '', projectUrl: '',
-  techStack: [] as string[], featured: false, order: 0,
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+type Lang = 'id' | 'en';
+
+type Category = 'company' | 'ecommerce' | 'webapp' | 'landing';
+
+const CATEGORIES: Category[] = ['company', 'ecommerce', 'webapp', 'landing'];
+
+interface PortfolioForm {
+  title:       Record<Lang, string>;
+  description: Record<Lang, string>;
+  category:    Category;
+  imageUrl:    string;
+  projectUrl:  string;
+  techStack:   string[];
+  featured:    boolean;
+  order:       number;
+}
+
+const EMPTY_FORM: PortfolioForm = {
+  title:       { id: '', en: '' },
+  description: { id: '', en: '' },
+  category:    'company',
+  imageUrl:    '',
+  projectUrl:  '',
+  techStack:   [],
+  featured:    false,
+  order:       0,
 };
 
-export default function PortfolioManager() {
-  const [items, setItems] = useState<Portfolio[]>([]);
-  const [editing, setEditing] = useState<typeof empty | null>(null);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [techInput, setTechInput] = useState('');
-  const [lang, setLang] = useState<'id' | 'en'>('id');
-  const [error, setError] = useState<string | null>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
+// ---------------------------------------------------------------------------
+// Validation
+// ---------------------------------------------------------------------------
 
-  const fetchItems = () => api.get('/portfolio').then(r => setItems(r.data.data || [])).catch(() => {});
+function validate(form: PortfolioForm): string | null {
+  if (!form.title.id.trim())       return 'Judul (ID) wajib diisi.';
+  if (!form.imageUrl.trim())       return 'Gambar wajib diupload.';
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
+
+export default function PortfolioManager() {
+  const [items, setItems]       = useState<Portfolio[]>([]);
+  const [form, setForm]         = useState<PortfolioForm | null>(null);
+  const [editId, setEditId]     = useState<string | null>(null);
+  const [lang, setLang]         = useState<Lang>('id');
+  const [techInput, setTechInput] = useState('');
+  const [isSaving, setSaving]   = useState(false);
+  const [error, setError]       = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // Data loading
+  // ---------------------------------------------------------------------------
+
+  const fetchItems = () => {
+    api.get('/portfolio')
+      .then(r => setItems(r.data.data ?? []))
+      .catch(() => {});
+  };
+
   useEffect(() => { fetchItems(); }, []);
 
-  const startEdit = (item: Portfolio) => {
+  // ---------------------------------------------------------------------------
+  // Form helpers
+  // ---------------------------------------------------------------------------
+
+  const openNew = () => {
+    setForm({ ...EMPTY_FORM, title: { id: '', en: '' }, description: { id: '', en: '' }, techStack: [] });
+    setEditId(null);
     setError(null);
-    setEditing({
-      title: item.title as { id: string; en: string },
-      description: item.description as { id: string; en: string },
-      category: item.category, imageUrl: item.imageUrl,
-      projectUrl: item.projectUrl || '', techStack: item.techStack,
-      featured: item.featured, order: item.order,
+  };
+
+  const openEdit = (item: Portfolio) => {
+    setError(null);
+    setForm({
+      title:       item.title       as Record<Lang, string>,
+      description: item.description as Record<Lang, string>,
+      category:    item.category    as Category,
+      imageUrl:    item.imageUrl,
+      projectUrl:  item.projectUrl ?? '',
+      techStack:   [...item.techStack],
+      featured:    item.featured,
+      order:       item.order,
     });
     setEditId(item.id);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editing) return;
+  const closeForm = () => { setForm(null); setEditId(null); setError(null); };
 
-    setUploading(true);
-    setError(null);
-    try {
-      const data = new FormData();
-      data.append('file', file);
-      data.append('alt', editing.title.id || 'portfolio');
+  const setBilingualField = (
+    field: 'title' | 'description',
+    value: string,
+  ) => setForm(prev => prev ? { ...prev, [field]: { ...prev[field], [lang]: value } } : prev);
 
-      const response = await api.post('/media', data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      if (response.data.status === 'ok') {
-        setEditing(p => p ? { ...p, imageUrl: response.data.data.url } : p);
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Gagal mengupload gambar.');
-    } finally {
-      setUploading(false);
-      if (imageInputRef.current) imageInputRef.current.value = '';
+  const addTech = () => {
+    const val = techInput.trim();
+    if (!val || !form) return;
+    if (!form.techStack.includes(val)) {
+      setForm(prev => prev ? { ...prev, techStack: [...prev.techStack, val] } : prev);
     }
+    setTechInput('');
   };
 
+  const removeTech = (tech: string) => {
+    setForm(prev => prev ? { ...prev, techStack: prev.techStack.filter(t => t !== tech) } : prev);
+  };
+
+  // ---------------------------------------------------------------------------
+  // Save / Delete
+  // ---------------------------------------------------------------------------
+
   const handleSave = async () => {
-    if (!editing) return;
+    if (!form) return;
+    const err = validate(form);
+    if (err) { setError(err); return; }
+
+    setSaving(true);
     setError(null);
-
-    // Frontend validation
-    if (!editing.title.id.trim()) { setError('Judul (ID) wajib diisi.'); return; }
-    if (!editing.title.en.trim()) { setError('Judul (EN) wajib diisi.'); return; }
-    if (!editing.description.id.trim()) { setError('Deskripsi (ID) wajib diisi.'); return; }
-    if (!editing.description.en.trim()) { setError('Deskripsi (EN) wajib diisi.'); return; }
-    if (!editing.imageUrl.trim()) { setError('Gambar wajib diisi.'); return; }
-
-    const payload = {
-      ...editing,
-      projectUrl: editing.projectUrl.trim() || undefined,
-    };
-
-    setLoading(true);
     try {
-      if (editId) await api.put(`/portfolio/${editId}`, payload);
-      else await api.post('/portfolio', payload);
-      setEditing(null); setEditId(null); fetchItems();
-    } catch (err: any) {
-      const errors = err.response?.data?.errors;
-      if (errors) {
-        const messages = Object.entries(errors)
-          .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(', ')}`)
-          .join(' | ');
-        setError(`Validasi gagal: ${messages}`);
+      if (editId) {
+        await api.put(`/portfolio/${editId}`, form);
       } else {
-        setError(err.response?.data?.message || 'Gagal menyimpan. Coba lagi.');
+        await api.post('/portfolio', form);
       }
+      fetchItems();
+      closeForm();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Gagal menyimpan item.';
+      setError(msg);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus portfolio ini?')) return;
-    await api.delete(`/portfolio/${id}`); fetchItems();
+    if (!confirm('Hapus item portfolio ini?')) return;
+    try {
+      await api.delete(`/portfolio/${id}`);
+      fetchItems();
+    } catch {
+      setError('Gagal menghapus item.');
+    }
   };
 
-  const addTech = () => {
-    if (!techInput.trim() || !editing) return;
-    setEditing(p => p ? { ...p, techStack: [...p.techStack, techInput.trim()] } : p);
-    setTechInput('');
-  };
+  // ---------------------------------------------------------------------------
+  // Render: edit form
+  // ---------------------------------------------------------------------------
 
-  const inputCls = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500';
-
-  if (editing) return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">{editId ? 'Edit Portfolio' : 'Portfolio Baru'}</h1>
-        <button onClick={() => { setEditing(null); setError(null); }} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
-      </div>
-
-      {/* Language toggle */}
-      <div className="flex gap-2">
-        {(['id', 'en'] as const).map(l => (
-          <button key={l} onClick={() => setLang(l)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${lang === l ? 'bg-primary-600 text-white' : 'bg-gray-800 text-gray-400'}`}>{l.toUpperCase()}</button>
-        ))}
-        <span className="text-xs text-gray-500 self-center ml-2">Isi kedua bahasa (ID & EN)</span>
-      </div>
-
-      {/* Error message */}
-      {error && (
-        <div className="bg-red-900/40 border border-red-700 text-red-300 rounded-lg px-4 py-3 text-sm">
-          {error}
+  if (form) {
+    return (
+      <div className="space-y-6 max-w-2xl">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white">
+            {editId ? 'Edit Portfolio' : 'Tambah Portfolio'}
+          </h1>
+          <button onClick={closeForm} className="text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 gap-4">
-        {/* Title & Description */}
-        {(['title', 'description'] as const).map(f => (
-          <div key={f}>
-            <label className="block text-sm text-gray-400 mb-1">
-              {f === 'title' ? 'Judul' : 'Deskripsi'} ({lang.toUpperCase()})
-              <span className="text-red-400 ml-1">*</span>
-            </label>
-            {f === 'description' ? (
-              <textarea value={(editing[f] as Record<string, string>)[lang]}
-                onChange={e => setEditing(p => p ? { ...p, [f]: { ...p[f], [lang]: e.target.value } as { id: string; en: string } } : p)}
-                rows={3} className={`${inputCls} resize-none`} />
-            ) : (
-              <input value={(editing[f] as Record<string, string>)[lang]}
-                onChange={e => setEditing(p => p ? { ...p, [f]: { ...p[f], [lang]: e.target.value } as { id: string; en: string } } : p)}
-                className={inputCls} />
-            )}
-          </div>
-        ))}
+        {error && <ErrorAlert message={error} />}
+
+        <LangTabs active={lang} onChange={setLang} />
+
+        {/* Title */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            Judul ({lang.toUpperCase()}) *
+          </label>
+          <input
+            type="text"
+            value={form.title[lang]}
+            onChange={e => setBilingualField('title', e.target.value)}
+            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            Deskripsi ({lang.toUpperCase()})
+          </label>
+          <textarea
+            rows={4}
+            value={form.description[lang]}
+            onChange={e => setBilingualField('description', e.target.value)}
+            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+          />
+        </div>
 
         {/* Category & Order */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Kategori</label>
-            <select value={editing.category} onChange={e => setEditing(p => p ? { ...p, category: e.target.value } : p)}
-              className={inputCls}>
-              {['company', 'ecommerce', 'webapp', 'landing'].map(c => <option key={c} value={c}>{c}</option>)}
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Kategori</label>
+            <select
+              value={form.category}
+              onChange={e => setForm(prev => prev ? { ...prev, category: e.target.value as Category } : prev)}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Urutan</label>
-            <input type="number" value={editing.order} onChange={e => setEditing(p => p ? { ...p, order: Number(e.target.value) } : p)} className={inputCls} />
-          </div>
-        </div>
-
-        {/* Image Upload */}
-        <div>
-          <label className="block text-sm text-gray-400 mb-2">
-            Gambar Portfolio <span className="text-red-400">*</span>
-          </label>
-
-          {/* Preview */}
-          <div className="relative w-full aspect-video bg-gray-800 border border-gray-700 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
-            {editing.imageUrl ? (
-              <>
-                <img src={editing.imageUrl} alt="preview" className="w-full h-full object-cover" />
-                <button
-                  onClick={() => setEditing(p => p ? { ...p, imageUrl: '' } : p)}
-                  className="absolute top-2 right-2 p-1 bg-red-900/80 text-red-300 rounded hover:bg-red-800 transition-colors"
-                  title="Hapus gambar"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-gray-600">
-                <ImageIcon className="w-10 h-10" />
-                <span className="text-sm">Belum ada gambar</span>
-              </div>
-            )}
-          </div>
-
-          {/* Upload button */}
-          <div className="flex gap-3 items-center">
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Urutan</label>
             <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="portfolio-image-upload"
-            />
-            <label
-              htmlFor="portfolio-image-upload"
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
-                uploading
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-500 text-white'
-              }`}
-            >
-              {uploading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Upload className="w-4 h-4" />
-              )}
-              {uploading ? 'Mengupload...' : 'Upload Gambar'}
-            </label>
-
-            {/* OR: manual URL input */}
-            <span className="text-gray-600 text-sm">atau</span>
-            <input
-              value={editing.imageUrl}
-              onChange={e => setEditing(p => p ? { ...p, imageUrl: e.target.value } : p)}
-              placeholder="paste URL..."
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              type="number"
+              value={form.order}
+              onChange={e => setForm(prev => prev ? { ...prev, order: Number(e.target.value) } : prev)}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
-          <p className="text-xs text-gray-600 mt-1.5">Format: JPG, PNG, WEBP, GIF, SVG. Maks 5MB.</p>
         </div>
 
         {/* Project URL */}
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Project URL (opsional)</label>
-          <input value={editing.projectUrl} onChange={e => setEditing(p => p ? { ...p, projectUrl: e.target.value } : p)}
-            placeholder="https://..." className={inputCls} />
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">URL Project</label>
+          <input
+            type="url"
+            value={form.projectUrl}
+            onChange={e => setForm(prev => prev ? { ...prev, projectUrl: e.target.value } : prev)}
+            placeholder="https://example.com"
+            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
         </div>
 
-        {/* Tech Stack */}
+        {/* Image upload */}
+        <ImageUploadField
+          label="Gambar Portfolio *"
+          value={form.imageUrl}
+          onChange={url => setForm(prev => prev ? { ...prev, imageUrl: url } : prev)}
+          altText={form.title.id || 'portfolio'}
+          onError={setError}
+        />
+
+        {/* Tech stack */}
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Tech Stack</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">Tech Stack</label>
           <div className="flex gap-2 mb-2">
-            <input value={techInput} onChange={e => setTechInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTech()}
-              placeholder="React, Node.js, ..." className={`${inputCls} flex-1`} />
-            <button onClick={addTech} className="px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700">Tambah</button>
+            <input
+              type="text"
+              value={techInput}
+              onChange={e => setTechInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTech())}
+              placeholder="React, Node.js, …"
+              className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <button
+              type="button"
+              onClick={addTech}
+              className="rounded-lg bg-primary-600 px-3 py-2 text-sm text-white hover:bg-primary-700"
+            >
+              Tambah
+            </button>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {editing.techStack.map(t => (
-              <span key={t} className="flex items-center gap-1 px-2 py-1 bg-primary-900/50 text-primary-300 text-xs rounded-full">
-                {t}
-                <button onClick={() => setEditing(p => p ? { ...p, techStack: p.techStack.filter(x => x !== t) } : p)} className="hover:text-red-400">×</button>
+          <div className="flex flex-wrap gap-1.5">
+            {form.techStack.map(tech => (
+              <span key={tech} className="flex items-center gap-1 rounded-full bg-primary-900/50 px-2.5 py-1 text-xs text-primary-300">
+                {tech}
+                <button type="button" onClick={() => removeTech(tech)} className="ml-0.5 text-primary-400 hover:text-red-400">
+                  <X className="w-3 h-3" />
+                </button>
               </span>
             ))}
           </div>
         </div>
 
-        {/* Featured */}
+        {/* Featured toggle */}
         <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={editing.featured} onChange={e => setEditing(p => p ? { ...p, featured: e.target.checked } : p)} className="w-4 h-4 accent-primary-500" />
-          <span className="text-sm text-gray-300">Featured</span>
+          <div
+            onClick={() => setForm(prev => prev ? { ...prev, featured: !prev.featured } : prev)}
+            className={`relative w-10 h-5 rounded-full transition-colors ${form.featured ? 'bg-amber-500' : 'bg-gray-600'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.featured ? 'translate-x-5' : ''}`} />
+          </div>
+          <span className="flex items-center gap-1.5 text-sm text-gray-300">
+            <Star className={`w-4 h-4 ${form.featured ? 'text-amber-400 fill-amber-400' : 'text-gray-500'}`} />
+            {form.featured ? 'Featured' : 'Biasa'}
+          </span>
         </label>
-      </div>
 
-      <button onClick={handleSave} disabled={loading || uploading} className="flex items-center gap-2 btn-primary px-6 py-3 disabled:opacity-50">
-        <Save className="w-4 h-4" /> {loading ? 'Menyimpan...' : 'Simpan'}
-      </button>
-    </div>
-  );
+        {/* Actions */}
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          >
+            <Save className="w-4 h-4" />
+            {isSaving ? 'Menyimpan…' : 'Simpan'}
+          </button>
+          <button
+            onClick={closeForm}
+            className="rounded-lg border border-gray-600 px-5 py-2.5 text-sm text-gray-300 hover:bg-gray-800"
+          >
+            Batal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Render: grid list
+  // ---------------------------------------------------------------------------
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Portfolio</h1>
-        <button onClick={() => { setEditing({ ...empty }); setEditId(null); setError(null); }} className="flex items-center gap-2 btn-primary px-4 py-2 text-sm">
-          <Plus className="w-4 h-4" /> Tambah
+        <button
+          onClick={openNew}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+        >
+          <Plus className="w-4 h-4" />
+          Tambah
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map(item => (
-          <div key={item.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-            <div className="aspect-video bg-gray-800 relative">
-              {item.imageUrl && <img src={item.imageUrl} alt={(item.title as Record<string, string>).id} className="w-full h-full object-cover" loading="lazy" />}
-              {item.featured && <span className="absolute top-2 left-2"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /></span>}
-            </div>
-            <div className="p-4">
-              <p className="text-sm font-medium text-white">{(item.title as Record<string, string>).id}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{item.category}</p>
-              <div className="flex justify-end gap-2 mt-3">
-                <button onClick={() => startEdit(item)} className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded"><Pencil className="w-4 h-4" /></button>
-                <button onClick={() => handleDelete(item.id)} className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded"><Trash2 className="w-4 h-4" /></button>
+
+      {error && <ErrorAlert message={error} />}
+
+      {items.length === 0 ? (
+        <p className="rounded-xl border border-gray-800 bg-gray-900 p-8 text-center text-sm text-gray-500">
+          Belum ada item portfolio.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {items.map(item => {
+            const titleId = (item.title as Record<string, string>).id;
+            return (
+              <div
+                key={item.id}
+                className="rounded-xl border border-gray-800 bg-gray-900 overflow-hidden"
+              >
+                <div className="relative h-32 bg-gray-800">
+                  {item.imageUrl && (
+                    <img
+                      src={item.imageUrl}
+                      alt={titleId}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  {item.featured && (
+                    <span className="absolute top-2 left-2">
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    </span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-medium text-white truncate">{titleId}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{item.category}</p>
+                  <div className="mt-3 flex justify-end gap-1.5">
+                    <button
+                      onClick={() => openEdit(item)}
+                      className="rounded p-1.5 text-gray-400 hover:bg-gray-700 hover:text-white"
+                      aria-label="Edit"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="rounded p-1.5 text-gray-400 hover:bg-red-900/20 hover:text-red-400"
+                      aria-label="Hapus"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -37,10 +37,16 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   } catch (err) { next(err); }
 });
 
-// GET /api/portfolio/:id - Public
-router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+// GET /api/portfolio/:idOrSlug - Public
+// Supports both UUID (id) and human-readable slug for SEO-friendly URLs
+router.get('/:idOrSlug', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const portfolio = await prisma.portfolio.findUnique({ where: { id: req.params.id } });
+    const { idOrSlug } = req.params;
+    // UUID format check (8-4-4-4-12)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+    const portfolio = isUuid
+      ? await prisma.portfolio.findUnique({ where: { id: idOrSlug } })
+      : await prisma.portfolio.findFirst({ where: { slug: idOrSlug } });
     if (!portfolio) throw new AppError(404, 'Portfolio not found');
     res.json({ status: 'ok', data: portfolio });
   } catch (err) { next(err); }

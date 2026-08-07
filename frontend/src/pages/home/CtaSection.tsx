@@ -1,0 +1,113 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSettingsStore } from '../../store/settingsStore';
+import { useInView } from '../../hooks/useInView';
+
+const FADE_MS = 1000;
+
+interface CtaSlideshowProps {
+  images: string[];
+  intervalMs: number;
+}
+
+/**
+ * Smooth crossfade slideshow used as the CTA section background.
+ * Uses two absolutely-positioned layers alternating opacity to avoid flicker.
+ */
+function CtaSlideshow({ images, intervalMs }: CtaSlideshowProps) {
+  const [index, setIndex]             = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (images.length < 2) return;
+    const timer = setInterval(() => {
+      setTransitioning(true);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % images.length);
+        setTransitioning(false);
+      }, FADE_MS);
+    }, intervalMs);
+    return () => clearInterval(timer);
+  }, [images.length, intervalMs]);
+
+  if (images.length === 0) {
+    return (
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  const current = index % images.length;
+  const next    = (index + 1) % images.length;
+
+  return (
+    <>
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity"
+        style={{
+          backgroundImage: `url(${images[current]})`,
+          opacity:         transitioning ? 0 : 1,
+          transitionDuration: `${FADE_MS}ms`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity"
+        style={{
+          backgroundImage: `url(${images[next]})`,
+          opacity:         transitioning ? 1 : 0,
+          transitionDuration: `${FADE_MS}ms`,
+        }}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-primary-900/70" aria-hidden="true" />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CtaSection
+// ---------------------------------------------------------------------------
+
+export default function CtaSection() {
+  const { t } = useTranslation(['pages']);
+  const { settings } = useSettingsStore();
+  const { ref, inView } = useInView(0.2);
+
+  const images      = JSON.parse(settings.ctaSlideImages  || '[]') as string[];
+  const intervalMs  = parseInt(settings.ctaSlideInterval  || '5000', 10);
+
+  return (
+    <section
+      ref={ref}
+      className="relative section-padding bg-primary-700 text-white overflow-hidden"
+      aria-labelledby="cta-heading"
+    >
+      <CtaSlideshow images={images} intervalMs={intervalMs} />
+
+      <div
+        className="container-custom text-center relative z-10 transition-all duration-700"
+        style={{
+          opacity:   inView ? 1 : 0,
+          transform: inView ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(20px)',
+        }}
+      >
+        <h2 id="cta-heading" className="text-3xl lg:text-4xl font-bold">
+          {t('home.cta.title')}
+        </h2>
+        <p className="mt-4 text-lg text-primary-200 max-w-xl mx-auto">
+          {t('home.cta.subtitle')}
+        </p>
+        <Link
+          to="/contact"
+          className="mt-8 inline-flex btn-primary bg-white text-primary-700 hover:bg-primary-50 text-base px-8 py-4 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          {t('home.cta.button')}
+        </Link>
+      </div>
+    </section>
+  );
+}

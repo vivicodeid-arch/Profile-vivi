@@ -11,17 +11,19 @@ interface SitemapUrl {
   priority?: string;
 }
 
-const TODAY = new Date().toISOString().split('T')[0];
-
-const staticRoutes: SitemapUrl[] = [
-  { loc: '/',         changefreq: 'weekly',  priority: '1.0', lastmod: TODAY },
-  { loc: '/about',    changefreq: 'monthly', priority: '0.8', lastmod: TODAY },
-  { loc: '/services', changefreq: 'monthly', priority: '0.8', lastmod: TODAY },
-  { loc: '/portfolio',changefreq: 'weekly',  priority: '0.8', lastmod: TODAY },
-  { loc: '/blog',     changefreq: 'daily',   priority: '0.9', lastmod: TODAY },
-  { loc: '/contact',  changefreq: 'monthly', priority: '0.7', lastmod: TODAY },
-  { loc: '/pricing',  changefreq: 'monthly', priority: '0.7', lastmod: TODAY },
-];
+// Computed per-request so lastmod is always accurate
+const getStaticRoutes = (): SitemapUrl[] => {
+  const today = new Date().toISOString().split('T')[0];
+  return [
+    { loc: '/',         changefreq: 'weekly',  priority: '1.0', lastmod: today },
+    { loc: '/about',    changefreq: 'monthly', priority: '0.8', lastmod: today },
+    { loc: '/services', changefreq: 'monthly', priority: '0.8', lastmod: today },
+    { loc: '/portfolio',changefreq: 'weekly',  priority: '0.8', lastmod: today },
+    { loc: '/blog',     changefreq: 'daily',   priority: '0.9', lastmod: today },
+    { loc: '/contact',  changefreq: 'monthly', priority: '0.7', lastmod: today },
+    { loc: '/pricing',  changefreq: 'monthly', priority: '0.7', lastmod: today },
+  ];
+};
 
 export const generateSitemap = async (): Promise<string> => {
   const posts = await prisma.post.findMany({
@@ -30,21 +32,23 @@ export const generateSitemap = async (): Promise<string> => {
     orderBy: { updatedAt: 'desc' },
   });
 
+  // Only include portfolio items with a non-empty slug (no active field on Portfolio model)
   const portfolios = await prisma.portfolio.findMany({
-    select: { id: true, slug: true, updatedAt: true },
+    where: { slug: { not: '' } },
+    select: { slug: true, updatedAt: true },
     orderBy: { updatedAt: 'desc' },
   });
 
   const urls: SitemapUrl[] = [
-    ...staticRoutes,
+    ...getStaticRoutes(),
     ...posts.map((p: { slug: string; updatedAt: Date }) => ({
       loc: `/blog/${p.slug}`,
       lastmod: p.updatedAt.toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7',
     })),
-    ...portfolios.map((p: { id: string; slug: string | null; updatedAt: Date }) => ({
-      loc: `/portfolio/${p.slug || p.id}`,
+    ...portfolios.map((p: { slug: string | null; updatedAt: Date }) => ({
+      loc: `/portfolio/${p.slug}`,
       lastmod: p.updatedAt.toISOString().split('T')[0],
       changefreq: 'monthly',
       priority: '0.6',
