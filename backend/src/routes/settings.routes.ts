@@ -51,6 +51,18 @@ const updateSettingsSchema = z.object({
   pricingHeroPosition: positionEnum.optional(),
   // Home about section
   aboutHomeImage: z.string().optional(),
+  aboutHomeSubtitle: z.string().optional(),
+  aboutHomeTitle: z.string().optional(),
+  aboutHomeDesc1: z.string().optional(),
+  aboutHomeDesc2: z.string().optional(),
+  aboutHomeFeature1: z.string().optional(),
+  aboutHomeFeature2: z.string().optional(),
+  aboutHomeFeature3: z.string().optional(),
+  aboutHomeFeature4: z.string().optional(),
+  aboutHomeFeature5: z.string().optional(),
+  aboutHomeFeature6: z.string().optional(),
+  aboutHomeCtaUrl: z.string().optional(),
+  aboutHomeCtaText: z.string().optional(),
   // Home services section
   servicesSectionHomeTitle: z.string().optional(),
   servicesSectionHomeSubtitle: z.string().optional(),

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Video, Monitor, Image as ImageIcon, Upload } from 'lucide-react';
+import { Video, Monitor, Image as ImageIcon, Upload, X } from 'lucide-react';
 import { POSITION_OPTIONS, type HeroPosition, type HeroType } from '../../lib/constants';
 import api from '../../services/api';
 
@@ -82,10 +82,30 @@ export default function HeroSection({ label, value, onChange, onError }: HeroSec
 
       {/* Media URL / upload (hidden for gradient) */}
       {value.type !== 'gradient' && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
             {value.type === 'video' ? 'URL Video' : 'URL Gambar'}
           </label>
+
+          {/* Image preview */}
+          {value.type === 'image' && value.url && (
+            <div className="relative inline-block">
+              <img
+                src={value.url}
+                alt="Hero preview"
+                className="h-28 w-auto rounded-lg border border-gray-300 dark:border-gray-600 object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => set({ url: '' })}
+                aria-label="Hapus gambar"
+                className="absolute -top-2 -right-2 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <input
               type="text"

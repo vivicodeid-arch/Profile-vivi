@@ -252,21 +252,31 @@ export default function SettingsManager() {
                 onChange={e => setForm(p => p ? { ...p, siteName: e.target.value } : p)}
                 placeholder="ViviDev.id" className={inputCls} />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Favicon URL</label>
-              <input type="text" value={form.faviconUrl}
-                onChange={e => setForm(p => p ? { ...p, faviconUrl: e.target.value } : p)}
-                placeholder="https://…/favicon.ico" className={inputCls} />
-            </div>
           </div>
 
-          <ImageUploadField
-            label="Logo"
-            value={form.logoUrl}
-            onChange={url => setForm(p => p ? { ...p, logoUrl: url } : p)}
-            altText="Logo"
-            onError={setError}
-          />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <ImageUploadField
+              label="Logo"
+              value={form.logoUrl}
+              onChange={url => setForm(p => p ? { ...p, logoUrl: url } : p)}
+              altText="Logo"
+              onError={setError}
+            />
+            <ImageUploadField
+              label="Favicon"
+              value={form.faviconUrl}
+              onChange={url => setForm(p => p ? { ...p, faviconUrl: url } : p)}
+              altText="Favicon"
+              onError={setError}
+            />
+            <ImageUploadField
+              label="Gambar Hero Utama (Mockup)"
+              value={form.heroImageUrl}
+              onChange={url => setForm(p => p ? { ...p, heroImageUrl: url } : p)}
+              altText="Hero mockup image"
+              onError={setError}
+            />
+          </div>
         </section>
 
         {/* ── Contact Info ──────────────────────────────────────────────────── */}
