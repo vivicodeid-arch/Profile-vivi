@@ -83,9 +83,15 @@ export default function App() {
   const { theme }         = useThemeStore();
 
   // Sync dark-mode class on <html>
+  // Admin pages: always dark (all admin components styled for dark mode)
+  // Public pages: follow user theme preference
   useEffect(() => {
+    if (isAdmin) {
+      document.documentElement.classList.add('dark');
+      return;
+    }
     document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+  }, [theme, isAdmin]);
 
   // Fetch CMS settings once on mount
   useEffect(() => {

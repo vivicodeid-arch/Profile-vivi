@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Code2, LayoutDashboard, FileText, Briefcase, Settings as SettingsIcon, Sliders, Users, Image as ImageIcon, LogOut, Menu, X, Handshake, Tag, Info } from 'lucide-react';
+import { Code2, LayoutDashboard, FileText, Briefcase, Settings as SettingsIcon, Sliders, Users, Image as ImageIcon, LogOut, Menu, X, Handshake, Tag, Info, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '../store/authStore';
+import { useThemeStore } from '../store/themeStore';
 
 const navItems = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -21,6 +22,7 @@ const navItems = [
 export default function AdminLayout() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
+  const { adminTheme, toggleAdminTheme } = useThemeStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -35,18 +37,21 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
+    <div className={`min-h-screen flex ${adminTheme === 'dark' ? 'dark' : ''}`} style={{ backgroundColor: adminTheme === 'dark' ? '#0D1B2A' : '#F0F4FF' }}>
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-200 lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-200 lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ backgroundColor: '#0D47A1', borderRight: '1px solid #1565C0' }}
+      >
+        <div className="flex items-center justify-between h-16 px-6" style={{ borderBottom: '1px solid #1565C0' }}>
           <NavLink to="/admin" className="flex items-center gap-2 font-bold text-lg text-white">
-            <Code2 className="w-6 h-6 text-primary-400" aria-hidden="true" />
-            <span>ViviDev<span className="text-primary-400">.id</span></span>
+            <Code2 className="w-6 h-6" style={{ color: '#90CAF9' }} aria-hidden="true" />
+            <span>ViviDev<span style={{ color: '#90CAF9' }}>.id</span></span>
           </NavLink>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-400 hover:text-white">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-blue-200 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -54,25 +59,30 @@ export default function AdminLayout() {
         <nav className="p-4 space-y-1" aria-label="Admin navigation">
           {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}>
+              className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-white text-blue-800'
+                  : 'text-blue-100 hover:text-white hover:bg-blue-700'
+              }`}
+            >
               <Icon className="w-4 h-4" aria-hidden="true" />
               {label}
             </NavLink>
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+        <div className="absolute bottom-0 left-0 right-0 p-4" style={{ borderTop: '1px solid #1565C0' }}>
           <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-blue-900 text-sm font-bold" style={{ backgroundColor: '#90CAF9' }}>
               {user?.email?.[0]?.toUpperCase() || 'A'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-white truncate">{user?.email}</p>
-              <p className="text-xs text-gray-500">{user?.role}</p>
+              <p className="text-xs text-blue-300">{user?.role}</p>
             </div>
           </div>
           <button onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors">
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-blue-200 hover:text-white hover:bg-red-600 transition-colors">
             <LogOut className="w-4 h-4" aria-hidden="true" />
             Logout
           </button>
@@ -84,14 +94,38 @@ export default function AdminLayout() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-gray-900 border-b border-gray-800 flex items-center px-6 lg:px-8">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden mr-4 text-gray-400 hover:text-white">
+        <header
+          className="h-16 flex items-center px-6 lg:px-8"
+          style={{
+            backgroundColor: adminTheme === 'dark' ? '#132F4C' : '#FFFFFF',
+            borderBottom: `1px solid ${adminTheme === 'dark' ? '#1565C0' : '#BBDEFB'}`,
+          }}
+        >
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden mr-4 hover:text-blue-600" style={{ color: '#1565C0' }}>
             <Menu className="w-5 h-5" />
           </button>
-          <a href="/" target="_blank" rel="noopener noreferrer"
-            className="ml-auto text-xs text-gray-500 hover:text-primary-400 transition-colors">
-            Lihat Website →
-          </a>
+          <div className="ml-auto flex items-center gap-3">
+            {/* Dark mode toggle */}
+            <button
+              onClick={toggleAdminTheme}
+              title={adminTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+              style={{
+                color: adminTheme === 'dark' ? '#90CAF9' : '#1565C0',
+                border: `1px solid ${adminTheme === 'dark' ? '#1565C0' : '#BBDEFB'}`,
+                backgroundColor: 'transparent',
+              }}
+            >
+              {adminTheme === 'dark'
+                ? <Sun className="w-4 h-4" />
+                : <Moon className="w-4 h-4" />
+              }
+            </button>
+            <a href="/" target="_blank" rel="noopener noreferrer"
+              className="text-xs transition-colors hover:text-blue-800" style={{ color: '#2196F3' }}>
+              Lihat Website →
+            </a>
+          </div>
         </header>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <Outlet />

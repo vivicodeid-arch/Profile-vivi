@@ -27,59 +27,73 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#E3F2FD' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-white text-2xl font-bold mb-2">
-            <Code2 className="w-8 h-8 text-primary-400" aria-hidden="true" />
-            ViviDev<span className="text-primary-400">.id</span>
+          <div className="inline-flex items-center gap-2 text-2xl font-bold mb-2" style={{ color: '#0D47A1' }}>
+            <Code2 className="w-8 h-8" style={{ color: '#2196F3' }} aria-hidden="true" />
+            ViviDev<span style={{ color: '#2196F3' }}>.id</span>
           </div>
-          <p className="text-gray-400 text-sm">Admin Panel</p>
+          <p className="text-sm" style={{ color: '#1565C0' }}>Admin Panel</p>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
-          <h1 className="text-xl font-semibold text-white mb-6">Masuk ke Dashboard</h1>
+        <div className="bg-white rounded-2xl p-8 shadow-lg" style={{ border: '1px solid #BBDEFB' }}>
+          <h1 className="text-xl font-semibold mb-6" style={{ color: '#0D47A1' }}>Masuk ke Dashboard</h1>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-sm text-red-300">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: '#1565C0' }}>Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#90CAF9' }} aria-hidden="true" />
                 <input
                   id="email" type="email" required autoComplete="email"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: '#F8FBFF',
+                    border: '1px solid #90CAF9',
+                    color: '#0D47A1',
+                  }}
                   placeholder="admin@vividev.id"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium mb-1.5" style={{ color: '#1565C0' }}>Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#90CAF9' }} aria-hidden="true" />
                 <input
                   id="password" type={showPass ? 'text' : 'password'} required autoComplete="current-password"
                   value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 rounded-lg text-sm focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: '#F8FBFF',
+                    border: '1px solid #90CAF9',
+                    color: '#0D47A1',
+                  }}
                   placeholder="••••••••"
                 />
                 <button type="button" onClick={() => setShowPass(v => !v)}
                   aria-label={showPass ? 'Hide password' : 'Show password'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-80" style={{ color: '#90CAF9' }}>
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
             <button type="submit" disabled={isLoading || !email || !password}
-              className="w-full py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-900 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-sm transition-colors">
+              className="w-full py-3 font-semibold rounded-lg text-sm transition-colors text-white disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ backgroundColor: '#0D47A1' }}
+              onMouseEnter={e => { if (!isLoading) (e.currentTarget as HTMLElement).style.backgroundColor = '#1565C0'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#0D47A1'; }}
+            >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
@@ -89,7 +103,7 @@ export default function AdminLogin() {
             </button>
           </form>
         </div>
-        <p className="text-center text-xs text-gray-600 mt-6">© {new Date().getFullYear()} ViviDev.id</p>
+        <p className="text-center text-xs mt-6" style={{ color: '#90CAF9' }}>© {new Date().getFullYear()} ViviDev.id</p>
       </div>
     </div>
   );
