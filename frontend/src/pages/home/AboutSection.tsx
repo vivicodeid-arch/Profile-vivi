@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useInView } from '../../hooks/useInView';
 
 const DEFAULT_FEATURES = [
   'Website berkualitas',
@@ -17,6 +18,7 @@ const DEFAULT_FEATURES = [
  */
 export default function AboutSection() {
   const { settings } = useSettingsStore();
+  const { ref, inView } = useInView(0.1);
 
   const features = [
     settings.aboutHomeFeature1 || DEFAULT_FEATURES[0],
@@ -28,12 +30,18 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="section-padding bg-white dark:bg-gray-900 overflow-hidden">
+    <section ref={ref} className="section-padding bg-white dark:bg-gray-900 overflow-hidden">
       <div className="container-custom">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Image */}
-          <div className="relative order-2 lg:order-1">
+          {/* Image — slide dari kiri */}
+          <div
+            className="relative order-2 lg:order-1 transition-all duration-700"
+            style={{
+              opacity:   inView ? 1 : 0,
+              transform: inView ? 'translateX(0)' : 'translateX(-30px)',
+            }}
+          >
             <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl -translate-x-1/4 -translate-y-1/4" />
             <img
               src={settings.aboutHomeImage || '/hero-mockup.png'}
@@ -43,8 +51,14 @@ export default function AboutSection() {
             />
           </div>
 
-          {/* Content */}
-          <div className="order-1 lg:order-2">
+          {/* Content — slide dari kanan */}
+          <div
+            className="order-1 lg:order-2 transition-all duration-700 delay-150"
+            style={{
+              opacity:   inView ? 1 : 0,
+              transform: inView ? 'translateX(0)' : 'translateX(30px)',
+            }}
+          >
             <h3 className="text-primary-600 font-semibold text-lg mb-2">
               {settings.aboutHomeSubtitle || 'Tentang Kami'}
             </h3>
