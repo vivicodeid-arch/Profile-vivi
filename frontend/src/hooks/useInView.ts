@@ -4,13 +4,22 @@ import { useEffect, useRef, useState } from 'react';
  * Fires once when the element enters the viewport.
  * Disconnects the observer after first intersection (trigger-once semantics).
  */
-export function useInView(threshold = 0.15) {
+export function useInView(threshold = 0.1) {
   const ref = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Check immediately if element is already in viewport
+    const rect = el.getBoundingClientRect();
+    const alreadyVisible =
+      rect.top < window.innerHeight && rect.bottom > 0;
+    if (alreadyVisible) {
+      setInView(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -19,7 +28,7 @@ export function useInView(threshold = 0.15) {
           observer.disconnect();
         }
       },
-      { threshold },
+      { threshold, rootMargin: '0px 0px -50px 0px' },
     );
 
     observer.observe(el);
