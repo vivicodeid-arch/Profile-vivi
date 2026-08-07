@@ -43,10 +43,19 @@ export function useApi<T>(url: string): UseApiReturn<T> {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     api
-      .get<{ data: T }>(url)
+      .get<{ status: string; data: T; meta?: unknown }>(url)
       .then(res => {
         if (!isMountedRef.current) return;
-        setState({ data: res.data.data ?? (res.data as unknown as T), isLoading: false, error: null });
+        // If response has both data and meta (paginated), return full response object.
+        // Otherwise extract res.data.data, falling back to res.data itself.
+        const hasData = res.data && typeof res.data === 'object' && 'data' in res.data;
+        const hasMeta = res.data && typeof res.data === 'object' && 'meta' in res.data;
+        const payload = (hasData && hasMeta)
+          ? (res.data as unknown as T)          // paginated — return { data, meta }
+          : hasData
+            ? (res.data.data as unknown as T)   // wrapped — return inner data
+            : (res.data as unknown as T);        // bare array/object
+        setState({ data: payload, isLoading: false, error: null });
       })
       .catch((err: unknown) => {
         if (!isMountedRef.current) return;

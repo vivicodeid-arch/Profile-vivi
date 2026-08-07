@@ -39,6 +39,10 @@
       "title": "About ViviDev.id",
       "subtitle": "We are a professional web developer team dedicated to building the best digital solutions."
     },
+    "mission": {
+      "title": "Our Mission",
+      "body": "ViviDev.id was founded with a simple mission: to help Indonesian businesses go digital with high-quality websites at affordable prices. Since 2019, we have helped dozens of businesses build a strong digital presence."
+    },
     "story": {
       "title": "Our Story",
       "content": "ViviDev.id was founded with a simple mission: to help Indonesian businesses go digital with high-quality websites at affordable prices. and 5 yers Professional Team"
@@ -47,6 +51,10 @@
       "title": "Our Values",
       "quality": "Quality",
       "qualityDesc": "We are committed to delivering the best work in every project.",
+      "speed": "Speed",
+      "speedDesc": "We prioritize efficiency without sacrificing quality.",
+      "dedication": "Dedication",
+      "dedicationDesc": "We are fully dedicated to the success of every client.",
       "innovation": "Innovation",
       "innovationDesc": "Always using the latest technology for optimal solutions.",
       "integrity": "Integrity",
@@ -64,6 +72,10 @@
     "hero": {
       "title": "Web Development Services",
       "subtitle": "Complete solutions for your business digital needs."
+    },
+    "cta": {
+      "title": "Ready to Start Your Project?",
+      "body": "Discuss your website needs with the ViviDev.id team today — free and without commitment."
     }
   },
   "portfolio": {
@@ -92,7 +104,13 @@
       "title": "Blog & Articles",
       "subtitle": "Tips, tutorials, and insights about web development."
     },
-    "noPost": "No articles yet."
+    "noPost": "No articles yet.",
+    "backToList": "Back to Blog",
+    "cta": {
+      "title": "Ready to Build a Professional Website?",
+      "body": "Consult your website needs with the ViviDev.id team now — free and without commitment.",
+      "button": "Contact Us"
+    }
   },
   "contact": {
     "meta": {

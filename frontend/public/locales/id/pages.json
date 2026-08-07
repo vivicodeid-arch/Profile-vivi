@@ -39,6 +39,10 @@
       "title": "Tentang ViviDev.id",
       "subtitle": "Kami adalah tim web developer profesional yang berdedikasi membangun solusi digital terbaik."
     },
+    "mission": {
+      "title": "Misi Kami",
+      "body": "ViviDev.id didirikan dengan misi sederhana: membantu bisnis Indonesia go digital dengan website berkualitas tinggi dan harga yang terjangkau. Sejak 2019, kami telah membantu puluhan bisnis membangun kehadiran digital yang kuat."
+    },
     "story": {
       "title": "Cerita Kami",
       "content": "ViviDev.id didirikan dengan misi sederhana: membantu bisnis Indonesia go digital dengan website berkualitas tinggi dan harga yang terjangkau. \nDan telah berdiri Sejak 2019 di Bandung , dengan team profesional"
@@ -47,6 +51,10 @@
       "title": "Nilai-Nilai Kami",
       "quality": "Kualitas",
       "qualityDesc": "Kami berkomitmen untuk menghasilkan karya terbaik di setiap proyek.",
+      "speed": "Kecepatan",
+      "speedDesc": "Kami mengutamakan efisiensi tanpa mengorbankan kualitas.",
+      "dedication": "Dedikasi",
+      "dedicationDesc": "Kami berdedikasi penuh untuk kesuksesan setiap klien.",
       "innovation": "Inovasi",
       "innovationDesc": "Selalu menggunakan teknologi terkini untuk solusi yang optimal.",
       "integrity": "Integritas",
@@ -64,6 +72,10 @@
     "hero": {
       "title": "Layanan Web Development",
       "subtitle": "Solusi lengkap untuk kebutuhan digital bisnis Anda."
+    },
+    "cta": {
+      "title": "Siap Memulai Proyek Anda?",
+      "body": "Konsultasikan kebutuhan website Anda dengan tim ViviDev.id sekarang — gratis dan tanpa komitmen."
     }
   },
   "portfolio": {
@@ -92,7 +104,13 @@
       "title": "Blog & Artikel",
       "subtitle": "Tips, tutorial, dan insight seputar web development."
     },
-    "noPost": "Belum ada artikel."
+    "noPost": "Belum ada artikel.",
+    "backToList": "Kembali ke Blog",
+    "cta": {
+      "title": "Siap Membangun Website Profesional?",
+      "body": "Konsultasikan kebutuhan website Anda dengan tim ViviDev.id sekarang — gratis dan tanpa komitmen.",
+      "button": "Hubungi Kami"
+    }
   },
   "contact": {
     "meta": {
