@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Check, ArrowRight } from 'lucide-react';
-import { useInView } from '../../hooks/useInView';
 import type { PricingPlan } from '../../types';
 
 interface PricingSectionProps {
@@ -14,22 +13,15 @@ interface PricingSectionProps {
 export default function PricingSection({ plans }: PricingSectionProps) {
   const { t, i18n } = useTranslation(['pages']);
   const lang = i18n.language as 'id' | 'en';
-  const { ref, inView } = useInView(0.1);
-
   if (plans.length === 0) return null;
 
   return (
     <section
-      ref={ref}
       className="section-padding bg-white dark:bg-gray-900"
       aria-labelledby="pricing-heading"
     >
       <div
-        className="container-custom transition-all duration-700"
-        style={{
-          opacity:   inView ? 1 : 0,
-          transform: inView ? 'translateY(0)' : 'translateY(24px)',
-        }}
+        className="container-custom"
       >
         <h2 id="pricing-heading" className="section-title">
           {t('home.pricing.title')}
