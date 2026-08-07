@@ -43,10 +43,10 @@ export default function Home() {
 
       <HeroSection />
       <StatsSection />
-      <PartnersSection />
       <ServicesSection services={services ?? []} />
       <AboutSection />
       <PricingSection plans={plans ?? []} />
+      <PartnersSection />
       <CtaSection />
     </>
   );
