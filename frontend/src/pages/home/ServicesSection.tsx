@@ -23,7 +23,8 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
   return (
     <section
       ref={ref}
-      className="section-padding bg-gray-50 dark:bg-gray-950 overflow-hidden"
+      className="section-padding overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #90CAF9 0%, #E3F2FD 50%, #90CAF9 100%)' }}
       aria-labelledby="services-heading"
     >
       <div className="container-custom">
@@ -42,12 +43,12 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
             </h3>
             <h2
               id="services-heading"
-              className="text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6"
+              className="text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight mb-6" style={{ color: '#0D47A1' }}
             >
               {settings.servicesSectionHomeTitle || t('home.services.title', { ns: 'pages' })}
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            <p className="mb-8 leading-relaxed" style={{ color: '#1565C0' }}>
               {settings.servicesSectionHomeDescription ||
                 'Kami menyediakan solusi web development lengkap untuk kebutuhan bisnis Anda. Dapatkan website modern, cepat, dan SEO-friendly yang dirancang khusus untuk meningkatkan kehadiran online Anda.'}
             </p>
@@ -59,7 +60,8 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
                 return (
                   <div
                     key={service.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 transition-all hover:-translate-y-1 hover:shadow-md"
+                    className="flex items-start gap-3 p-3 rounded-lg shadow-sm border transition-all hover:-translate-y-1 hover:shadow-md"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.85)', borderColor: '#90CAF9' }}
                   >
                     <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center shrink-0">
                       <Icon className="w-5 h-5 text-primary-600 dark:text-primary-400" aria-hidden="true" />
@@ -90,7 +92,7 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
               transform: inView ? 'translateX(0)' : 'translateX(40px)',
             }}
           >
-            <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl translate-x-1/4 -translate-y-1/4" />
+            <div className="absolute inset-0 rounded-full blur-3xl translate-x-1/4 -translate-y-1/4" style={{ backgroundColor: 'rgba(33,150,243,0.12)' }} />
             <img
               src={settings.servicesSectionHomeImage || '/hero-mockup.png'}
               alt="Layanan Kami"

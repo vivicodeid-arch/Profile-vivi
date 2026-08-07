@@ -19,10 +19,10 @@ function StatItem({ value, label, inView }: StatItemProps) {
 
   return (
     <div className="text-center group">
-      <div className="text-4xl lg:text-5xl font-bold text-primary-500 tabular-nums transition-all duration-300 group-hover:scale-110">
+      <div className="text-4xl lg:text-5xl font-bold tabular-nums transition-all duration-300 group-hover:scale-110" style={{ color: '#0D47A1' }}>
         {isNumeric ? `${count}${suffix}` : value}
       </div>
-      <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 font-medium">{label}</div>
+      <div className="mt-2 text-sm font-medium" style={{ color: '#1565C0' }}>{label}</div>
     </div>
   );
 }
@@ -45,7 +45,8 @@ export default function StatsSection() {
   return (
     <section
       ref={ref}
-      className="bg-white dark:bg-gray-900 py-16 shadow-sm dark:shadow-none border-b border-gray-100 dark:border-gray-800"
+      className="py-16 border-b border-blue-100"
+      style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #90CAF9 50%, #E3F2FD 100%)' }}
       aria-label="Statistik"
     >
       <div className="container-custom">

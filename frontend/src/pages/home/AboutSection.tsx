@@ -30,7 +30,11 @@ export default function AboutSection() {
   ];
 
   return (
-    <section ref={ref} className="section-padding bg-white dark:bg-gray-900 overflow-hidden">
+    <section
+      ref={ref}
+      className="section-padding overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #E3F2FD 0%, #ffffff 40%, #E3F2FD 100%)' }}
+    >
       <div className="container-custom">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 

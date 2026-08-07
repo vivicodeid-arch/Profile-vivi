@@ -63,7 +63,7 @@ function CtaSlideshow({ images, intervalMs }: CtaSlideshowProps) {
         }}
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-primary-900/70" aria-hidden="true" />
+      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(13,71,161,0.75)' }} aria-hidden="true" />
     </>
   );
 }
@@ -83,7 +83,8 @@ export default function CtaSection() {
   return (
     <section
       ref={ref}
-      className="relative section-padding bg-primary-700 text-white overflow-hidden"
+      className="relative section-padding text-white overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 40%, #2196F3 70%, #0D47A1 100%)' }}
       aria-labelledby="cta-heading"
     >
       <CtaSlideshow images={images} intervalMs={intervalMs} />
@@ -98,12 +99,15 @@ export default function CtaSection() {
         <h2 id="cta-heading" className="text-3xl lg:text-4xl font-bold">
           {t('home.cta.title')}
         </h2>
-        <p className="mt-4 text-lg text-primary-200 max-w-xl mx-auto">
+        <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: '#90CAF9' }}>
           {t('home.cta.subtitle')}
         </p>
         <Link
           to="/contact"
-          className="mt-8 inline-flex btn-primary bg-white text-primary-700 hover:bg-primary-50 text-base px-8 py-4 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="mt-8 inline-flex btn-primary text-base px-8 py-4 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold rounded-full"
+          style={{ backgroundColor: '#E3F2FD', color: '#0D47A1' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#90CAF9'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#E3F2FD'; }}
         >
           {t('home.cta.button')}
         </Link>
