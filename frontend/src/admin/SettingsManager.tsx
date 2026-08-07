@@ -33,6 +33,8 @@ interface FormState {
   portfolio: HeroConfig;
   services:  HeroConfig;
   pricing:   HeroConfig;
+  // Home about section
+  aboutHomeImage: string;
   // Home services section
   servicesSectionHomeTitle: string;
   servicesSectionHomeSubtitle: string;
@@ -105,6 +107,7 @@ export default function SettingsManager() {
       logoUrl:     s.logoUrl     || '',
       faviconUrl:  s.faviconUrl  || '',
       heroImageUrl: s.heroImageUrl || '',
+      aboutHomeImage: s.aboutHomeImage || '',
 
       about:     heroFromSettings('about',     s),
       blog:      heroFromSettings('blog',      s),
@@ -178,6 +181,7 @@ export default function SettingsManager() {
         logoUrl:     form.logoUrl,
         faviconUrl:  form.faviconUrl,
         heroImageUrl: form.heroImageUrl,
+        aboutHomeImage: form.aboutHomeImage,
 
         ...heroToSettings('about',     form.about),
         ...heroToSettings('blog',      form.blog),
@@ -314,6 +318,19 @@ export default function SettingsManager() {
               onError={setError}
             />
           ))}
+        </section>
+
+        {/* ── Home About Section ───────────────────────────────────────────── */}
+        <section className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 space-y-4">
+          <h2 className="text-base font-semibold text-white">Home — Seksi Tentang Kami</h2>
+          <p className="text-sm text-gray-400">Gambar yang tampil di section "Tentang Kami" pada halaman Home.</p>
+          <ImageUploadField
+            label="Gambar Tentang Kami"
+            value={form.aboutHomeImage}
+            onChange={url => setForm(p => p ? { ...p, aboutHomeImage: url } : p)}
+            altText="About section image"
+            onError={setError}
+          />
         </section>
 
         {/* ── Home Services Section ─────────────────────────────────────────── */}

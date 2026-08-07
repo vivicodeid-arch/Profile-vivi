@@ -13,6 +13,12 @@ const updateSettingsSchema = z.object({
   logoUrl: z.string().optional(),
   faviconUrl: z.string().optional(),
   heroImageUrl: z.string().optional(),
+  // Contact info
+  contactEmail: z.string().optional(),
+  contactPhone: z.string().optional(),
+  contactAddress: z.string().optional(),
+  contactWaNumber: z.string().optional(),
+  // Per-page heroes
   contactHeroType: z.enum(["gradient", "image", "video"]).optional(),
   contactHeroUrl: z.string().optional(),
   contactHeroTitle: z.string().optional(),
@@ -43,7 +49,15 @@ const updateSettingsSchema = z.object({
   pricingHeroTitle: z.string().optional(),
   pricingHeroSubtitle: z.string().optional(),
   pricingHeroPosition: positionEnum.optional(),
-  ctaSlideImages: z.string().optional(),  // JSON array of image URLs
+  // Home about section
+  aboutHomeImage: z.string().optional(),
+  // Home services section
+  servicesSectionHomeTitle: z.string().optional(),
+  servicesSectionHomeSubtitle: z.string().optional(),
+  servicesSectionHomeDescription: z.string().optional(),
+  servicesSectionHomeImage: z.string().optional(),
+  // CTA slideshow
+  ctaSlideImages: z.string().optional(),   // JSON array of image URLs
   ctaSlideInterval: z.string().optional(), // ms between slides
 });
 
