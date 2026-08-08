@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Code2, Mail, Phone, MapPin } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { SUPPORT_EMAIL, WA_NUMBER } from '../../lib/constants';
+import { getOptUrl } from '../../lib/images';
 
 const NAV_LINKS = [
   { to: '/',          key: 'nav.home'      },
@@ -34,7 +35,7 @@ export default function Footer() {
             <Link to="/" className="flex items-center gap-2 font-bold text-xl text-white mb-4">
               {settings.logoUrl ? (
                 <img
-                  src={settings.logoUrl}
+                  src={getOptUrl(settings.logoUrl, 320)}
                   alt={settings.siteName || 'Logo'}
                   className="h-8 max-w-[140px] object-contain"
                   width={200}

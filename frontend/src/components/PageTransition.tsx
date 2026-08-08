@@ -13,7 +13,10 @@ export default function PageTransition({ children, locationKey }: PageTransition
     if (!el) return;
 
     // Scroll to top on page change
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Use setTimeout to move this outside the critical render path and avoid LCP delay
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 0);
 
     // Restart CSS animation without forcing a layout reflow.
     // Double-rAF ensures the browser has painted the "removed" state

@@ -1,4 +1,5 @@
 import { useApi } from '../../hooks/useApi';
+import { getOptUrl } from '../../lib/images';
 
 interface Partner {
   id: string;
@@ -49,7 +50,7 @@ function PartnerLogo({ partner }: { partner: Partner }) {
   const content = (
     <div className="flex items-center justify-center h-10 w-36 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300 shrink-0">
       <img
-        src={partner.logoUrl}
+        src={getOptUrl(partner.logoUrl, 320)}
         alt={partner.name}
         className="max-h-full max-w-full object-contain"
         loading="lazy"

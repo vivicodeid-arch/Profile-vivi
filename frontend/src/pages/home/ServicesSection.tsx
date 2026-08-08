@@ -253,7 +253,7 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
             >
               <img
                 {...responsiveSrc(settings.servicesSectionHomeImage || '/hero-mockup.png')}
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 640px"
                 alt="Layanan Kami"
                 className="relative z-10 w-full h-auto object-contain drop-shadow-2xl"
                 loading="lazy"
