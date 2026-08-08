@@ -212,7 +212,7 @@ export default function Header() {
             {/* Language switcher */}
             <button
               onClick={toggleLang}
-              aria-label="Switch language"
+              aria-label={i18n.language === 'id' ? 'Switch language to EN' : 'Switch language to ID'}
               className="flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
             >
               <Globe className="w-4 h-4" aria-hidden="true" />

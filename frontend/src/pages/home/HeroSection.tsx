@@ -219,16 +219,16 @@ export default function HeroSection() {
                 to="/services"
                 className="font-semibold text-base px-8 py-4 rounded-full inline-flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 hover:shadow-lg w-fit"
                 style={{
-                  backgroundColor: '#2196F3',
+                  backgroundColor: '#1565C0',
                   color: '#fff',
-                  boxShadow: '0 0 0 0 rgba(33,150,243,0)',
+                  boxShadow: '0 0 0 0 rgba(21,101,192,0)',
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#1976D2';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 30px rgba(33,150,243,0.4)';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#0D47A1';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 30px rgba(21,101,192,0.4)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = '#2196F3';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = '#1565C0';
                   (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                 }}
               >

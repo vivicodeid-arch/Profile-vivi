@@ -68,9 +68,9 @@ export default function AboutSection() {
               transform: inView ? 'translateX(0)' : 'translateX(30px)',
             }}
           >
-            <h3 className="text-primary-600 font-semibold text-lg mb-2">
+            <h2 className="text-primary-600 font-semibold text-lg mb-2">
               {settings.aboutHomeSubtitle || 'Tentang Kami'}
-            </h3>
+            </h2>
             <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6">
               {settings.aboutHomeTitle || 'Bangun Kredibilitas Bisnis Lewat Website Profesional'}
             </h2>

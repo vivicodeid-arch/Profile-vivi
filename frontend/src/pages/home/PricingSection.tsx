@@ -100,8 +100,9 @@ export default function PricingSection({ plans }: PricingSectionProps) {
                 {plan.badge && (
                   <span
                     className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-lg
-                      ${plan.highlighted ? 'bg-red-500 text-white shadow-red-500/40' : 'bg-slate-700 text-slate-200'}
+                      ${plan.highlighted ? 'text-white shadow-red-800/40' : 'bg-slate-700 text-slate-200'}
                     `}
+                    style={plan.highlighted ? { backgroundColor: '#c81e1e' } : {}}
                   >
                     ★ {plan.badge}
                   </span>

@@ -185,9 +185,9 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
               transform: inView ? 'translateY(0)' : 'translateY(20px)',
             }}
           >
-            <h3 className="text-primary-600 font-semibold text-lg mb-2">
+            <h2 className="text-primary-600 font-semibold text-lg mb-2">
               {settings.servicesSectionHomeSubtitle || t('home.services.subtitle', { ns: 'pages' })}
-            </h3>
+            </h2>
             <h2
               id="services-heading"
               className="text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight mb-6"
