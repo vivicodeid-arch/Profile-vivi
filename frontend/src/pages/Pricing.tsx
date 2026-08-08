@@ -180,7 +180,7 @@ function PricingCard({ plan, lang, index }: PricingCardProps) {
                 {originalPriceStr}
               </span>
               {isHighlighted && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">POTONGAN SPESIAL</span>
+                <span className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#b91c1c' }}>POTONGAN SPESIAL</span>
               )}
             </div>
             <div className="flex items-baseline gap-1">

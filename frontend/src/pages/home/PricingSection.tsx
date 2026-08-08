@@ -124,7 +124,7 @@ export default function PricingSection({ plans }: PricingSectionProps) {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm text-slate-400 line-through decoration-red-500">{originalPriceStr}</span>
                         {plan.highlighted && (
-                          <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">POTONGAN SPESIAL</span>
+                           <span className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#b91c1c' }}>POTONGAN SPESIAL</span>
                         )}
                       </div>
                       <div className="flex items-baseline gap-1">
