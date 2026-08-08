@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Menu, X, Globe, Code2, Sun, Moon } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useThemeStore } from '../../store/themeStore';
+import { getOptUrl } from '../../lib/images';
 
 /** Renders the site name with a dynamic 3D extrusion text-shadow that
  *  follows the mouse cursor for a depth illusion. */
@@ -169,7 +170,7 @@ export default function Header() {
             >
               {settings.logoUrl ? (
                 <Tilt3D>
-                  <img src={settings.logoUrl} alt={settings.siteName || 'Logo'} className="h-[28px] max-w-[130px] object-contain" width={200} height={50} />
+                  <img src={getOptUrl(settings.logoUrl, 320)} alt={settings.siteName || 'Logo'} className="h-[28px] max-w-[130px] object-contain" width={200} height={50} />
                 </Tilt3D>
               ) : (
                 <>

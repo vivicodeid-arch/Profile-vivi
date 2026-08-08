@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaClient } from '@prisma/client';
+import { optimize } from 'svgo';
 import { authenticate } from '../middleware/auth.middleware';
 import { uploadLimiter } from '../middleware/rateLimit';
 import { AppError } from '../middleware/errorHandler';
@@ -43,6 +44,24 @@ const upload = multer({
 router.post('/', authenticate, uploadLimiter, upload.single('file'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.file) throw new AppError(400, 'No file uploaded');
+    
+    const filePath = path.resolve(env.UPLOAD_DIR, req.file.filename);
+    
+    if (req.file.mimetype === 'image/svg+xml') {
+      try {
+        const svgData = fs.readFileSync(filePath, 'utf8');
+        const result = optimize(svgData, {
+          path: filePath,
+          multipass: true,
+        });
+        fs.writeFileSync(filePath, result.data);
+        const stat = fs.statSync(filePath);
+        req.file.size = stat.size;
+      } catch (err) {
+        console.error('Failed to optimize SVG:', err);
+      }
+    }
+
     const url = `/uploads/${req.file.filename}`;
     const media = await prisma.media.create({
       data: {

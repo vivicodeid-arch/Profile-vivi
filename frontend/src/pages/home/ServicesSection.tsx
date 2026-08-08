@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useInView } from '../../hooks/useInView';
 import { SERVICE_ICON_MAP } from '../../lib/constants';
+import { responsiveSrc } from '../../lib/images';
 import { useTilt } from '../../hooks/useTilt';
 import type { Service } from '../../types';
 
@@ -251,7 +252,8 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
               style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
             >
               <img
-                src={settings.servicesSectionHomeImage || '/hero-mockup.png'}
+                {...responsiveSrc(settings.servicesSectionHomeImage || '/hero-mockup.png')}
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 alt="Layanan Kami"
                 className="relative z-10 w-full h-auto object-contain drop-shadow-2xl"
                 loading="lazy"

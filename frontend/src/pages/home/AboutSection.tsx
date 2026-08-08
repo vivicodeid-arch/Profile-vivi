@@ -55,8 +55,8 @@ export default function AboutSection() {
               alt="ViviDev Web Design Mockup"
               className="relative w-full aspect-[11/6] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
               loading="eager"
-              width={1440}
-              height={785}
+              width={1100}
+              height={600}
             />
           </div>
 

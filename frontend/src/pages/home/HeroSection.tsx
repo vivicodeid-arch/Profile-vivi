@@ -299,6 +299,8 @@ export default function HeroSection() {
                 className="relative z-10 w-full max-w-[560px] aspect-[5/4] object-contain drop-shadow-2xl"
                 loading="eager"
                 fetchPriority="high"
+                width={560}
+                height={448}
               />
             </div>
           </div>

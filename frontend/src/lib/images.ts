@@ -48,3 +48,13 @@ export function responsiveSrc(
     srcSet: variants.join(', '),
   };
 }
+
+/**
+ * Returns a specific WebP proxy URL for a given CMS image,
+ * useful for small elements like logos to avoid loading the full-size default.
+ */
+export function getOptUrl(url: string | undefined, width: number = 320): string | undefined {
+  if (!canResize(url)) return url;
+  const filename = url!.split('/').pop();
+  return `/uploads/opt/${width}/${filename}`;
+}
