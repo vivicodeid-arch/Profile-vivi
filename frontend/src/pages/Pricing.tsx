@@ -156,7 +156,7 @@ function PricingCard({ plan, lang, index }: PricingCardProps) {
           className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-lg
             ${isHighlighted ? 'text-white shadow-red-800/40' : 'bg-slate-700 text-slate-200'}
           `}
-          style={isHighlighted ? { backgroundColor: '#c81e1e' } : {}}
+          style={isHighlighted ? { backgroundColor: '#b91c1c' } : {}}
         >
           ★ {plan.badge}
         </span>

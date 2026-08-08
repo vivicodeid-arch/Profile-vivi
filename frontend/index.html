@@ -33,15 +33,15 @@
          fetchPriority="high" + srcset instead. Keep the fallback asset tiny. -->
 
     <!-- Plus Jakarta Sans font
-         - Only load weights actually used in the design (400,500,600,700)
-         - Preloaded eagerly so the browser has the font before first paint,
-           eliminating the font-swap layout shift (FILS) that was causing CLS.
-         - display=swap kept for resilience but preconnect + preload means the
-           font arrives before text renders in practice.                      -->
+         - display=optional: browser uses cached font immediately, falls back to
+           system font on first visit with no swap/shift at all. This eliminates
+           FILS (Font-Induced Layout Shift) which was causing CLS to spike.
+         - On repeat visits the font is cached → zero layout shift, zero FOIT.
+         - preconnect still helps warm the connection for the first visit.    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=optional"
       rel="stylesheet"
     />
 
