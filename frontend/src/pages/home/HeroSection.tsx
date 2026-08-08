@@ -69,12 +69,17 @@ export default function HeroSection() {
   const { t, i18n } = useTranslation(['common', 'pages']);
   const lang = i18n.language as 'id' | 'en';
   const { settings } = useSettingsStore();
+  // Start visible immediately — the 300 ms delay was deferring the first paint
+  // and causing NO_FCP on slow connections. Entrance animations still run via
+  // CSS transition once the element is in the DOM.
   const [visible, setVisible] = useState(false);
   const heroTilt = useTilt<HTMLDivElement>({ maxRotate: 15, scale: 1.04, perspective: 800 });
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 300);
-    return () => clearTimeout(timer);
+    // Use rAF so the browser paints the initial frame first, then kicks off
+    // the fade-in transition — no arbitrary 300 ms network-dependent delay.
+    const raf = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   const fadeIn = (delay: string): React.CSSProperties => ({

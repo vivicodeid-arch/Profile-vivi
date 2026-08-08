@@ -12,6 +12,11 @@ i18n
     supportedLngs: ['id', 'en'],
     defaultNS: 'common',
     ns: ['common', 'pages'],
+    // Render immediately with fallback keys — do NOT block paint waiting for
+    // translation JSON to arrive over the network (critical for FCP on slow 4G)
+    react: {
+      useSuspense: false,
+    },
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
