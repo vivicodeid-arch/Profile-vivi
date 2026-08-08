@@ -126,7 +126,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
 
 export const useSettingsStore = create<SettingsState>((set) => ({
   settings: DEFAULT_SETTINGS,
-  isLoading: false,
+  isLoading: true,
 
   fetchSettings: async () => {
     set({ isLoading: true });
