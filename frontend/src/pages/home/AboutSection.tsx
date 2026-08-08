@@ -34,7 +34,7 @@ export default function AboutSection() {
   return (
     <section
       ref={ref}
-      className="section-padding overflow-hidden"
+      className="section-padding overflow-hidden lg:min-h-[700px]"
       style={{ background: 'linear-gradient(160deg, #E3F2FD 0%, #ffffff 40%, #E3F2FD 100%)' }}
     >
       <div className="container-custom">

@@ -170,7 +170,7 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
   return (
     <section
       ref={ref}
-      className="section-padding overflow-hidden"
+      className="section-padding overflow-hidden lg:min-h-[700px]"
       style={{ background: 'linear-gradient(160deg, #90CAF9 0%, #E3F2FD 50%, #90CAF9 100%)' }}
       aria-labelledby="services-heading"
     >

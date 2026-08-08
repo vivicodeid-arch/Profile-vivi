@@ -39,7 +39,7 @@ export default function PricingSection({ plans }: PricingSectionProps) {
   return (
     <section
       ref={ref}
-      className="section-padding bg-[#0f172a] text-white"
+      className="section-padding bg-[#0f172a] text-white lg:min-h-[1000px]"
       aria-labelledby="pricing-heading"
     >
       <div className="container-custom">
