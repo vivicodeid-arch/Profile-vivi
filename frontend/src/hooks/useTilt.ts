@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 
 interface TiltOptions {
   maxRotate?: number; // max degrees (default 20)
@@ -10,6 +10,10 @@ interface TiltOptions {
  * Returns ref + event handlers that apply a CSS perspective 3D tilt effect
  * relative to the element's own bounding box — not the whole window.
  *
+ * Uses will-change: transform so the browser promotes the element to its own
+ * compositor layer, keeping tilt animations off the main thread (avoids the
+ * "non-composited animations" Lighthouse audit warning).
+ *
  * Usage:
  *   const { ref, onMouseMove, onMouseLeave } = useTilt();
  *   <div ref={ref} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} />
@@ -17,6 +21,14 @@ interface TiltOptions {
 export function useTilt<T extends HTMLElement = HTMLDivElement>(opts: TiltOptions = {}) {
   const { maxRotate = 20, scale = 1.06, perspective = 600 } = opts;
   const ref = useRef<T>(null);
+
+  // Promote to compositor layer on mount, release on unmount
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.willChange = 'transform';
+    return () => { el.style.willChange = 'auto'; };
+  }, []);
 
   const onMouseMove = useCallback((e: React.MouseEvent<T>) => {
     const el = ref.current;

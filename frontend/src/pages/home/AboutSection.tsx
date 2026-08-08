@@ -51,7 +51,8 @@ export default function AboutSection() {
               src={settings.aboutHomeImage || '/hero-mockup.png'}
               alt="ViviDev Web Design Mockup"
               className="relative z-10 w-full h-auto object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
-              loading="lazy"
+              width={600}
+              height={450}
             />
           </div>
 

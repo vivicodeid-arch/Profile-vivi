@@ -28,21 +28,26 @@
     <meta name="twitter:description" content="ViviDev.id menyediakan jasa web developer profesional. Kami membangun website modern, cepat, dan SEO-friendly untuk bisnis Anda." />
     <meta name="twitter:image" content="https://vividev.id/og-default.jpg" />
 
+    <!-- Preload hero image so the browser discovers it early and starts
+         downloading before the JS bundle even executes (critical for LCP) -->
+    <link rel="preload" as="image" href="/hero-mockup.png" fetchpriority="high" />
+
     <!-- Plus Jakarta Sans font
-         - preconnect hints cut DNS+TCP+TLS latency on first font request
+         - Only load weights actually used in the design (400,500,600,700)
+         - Removed unused weight 800 and italic variant (~35 KB saving)
          - media="print" trick: browser downloads non-render-blocking, then
            onload swaps to "all" so text renders with fallback first (no FOIT)
          - <noscript> fallback keeps it working without JS               -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     </noscript>
 
     <!-- Schema.org JSON-LD -->

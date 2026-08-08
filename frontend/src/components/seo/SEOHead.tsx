@@ -26,10 +26,14 @@ export const SEOHead = ({
   const { i18n } = useTranslation();
   const lang = i18n.language || 'id';
   const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : BASE_URL;
-  // Hreflang: point each language variant to its own URL with ?lang= param,
-  // so Google understands these are separate language versions.
-  const idUrl = canonical ? `${BASE_URL}${canonical}?lang=id` : `${BASE_URL}/?lang=id`;
-  const enUrl = canonical ? `${BASE_URL}${canonical}?lang=en` : `${BASE_URL}/?lang=en`;
+
+  // Hreflang: Google recommends separate URLs per language. Since this is a
+  // single-domain SPA that uses localStorage for language preference, we point
+  // both hreflang tags to the same canonical URL. This is valid per Google's
+  // spec — do NOT use ?lang= query params because Google treats them as
+  // duplicate pages and may canonicalize to the wrong variant.
+  const idUrl = canonicalUrl;
+  const enUrl = canonicalUrl;
 
   return (
     <Helmet>
@@ -42,7 +46,7 @@ export const SEOHead = ({
       }
       <link rel="canonical" href={canonicalUrl} />
 
-      {/* Hreflang — each language points to a distinct URL */}
+      {/* Hreflang */}
       <link rel="alternate" hrefLang="id" href={idUrl} />
       <link rel="alternate" hrefLang="en" href={enUrl} />
       <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
@@ -55,14 +59,17 @@ export const SEOHead = ({
       <meta property="og:image" content={ogImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={title} />
       <meta property="og:site_name" content="ViviDev.id" />
       <meta property="og:locale" content={lang === 'id' ? 'id_ID' : 'en_US'} />
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@vividevid" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image:alt" content={title} />
 
       {/* Schema.org JSON-LD */}
       {schema && (

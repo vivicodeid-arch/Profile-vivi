@@ -10,24 +10,38 @@ import { useThemeStore } from '../../store/themeStore';
 function Logo3DText({ siteName }: { siteName?: string }) {
   const spanRef = useRef<HTMLSpanElement>(null);
   const [shadow, setShadow] = useState('');
+  // Track pending rAF to avoid queuing more than one frame at a time
+  const rafRef = useRef<number | null>(null);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    const el = spanRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = Math.max(-20, Math.min(20, (e.clientX - cx) * 0.25));
-    const dy = Math.max(-20, Math.min(20, (e.clientY - cy) * 0.25));
-    const layers = Array.from({ length: 6 }, (_, i) => {
-      const depth = i + 1;
-      const alpha = 0.55 - i * 0.08;
-      return `${(dx * depth) / 6}px ${(dy * depth) / 6}px 0 rgba(0,0,0,${alpha})`;
+    // Throttle to one rAF per frame — prevents flooding the main thread on
+    // every mousemove event (which can fire 100+ times/sec)
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const el = spanRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = Math.max(-20, Math.min(20, (e.clientX - cx) * 0.25));
+      const dy = Math.max(-20, Math.min(20, (e.clientY - cy) * 0.25));
+      const layers = Array.from({ length: 6 }, (_, i) => {
+        const depth = i + 1;
+        const alpha = 0.55 - i * 0.08;
+        return `${(dx * depth) / 6}px ${(dy * depth) / 6}px 0 rgba(0,0,0,${alpha})`;
+      });
+      setShadow(layers.join(', '));
     });
-    setShadow(layers.join(', '));
   }, []);
 
-  const handleMouseLeave = useCallback(() => setShadow(''), []);
+  const handleMouseLeave = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    setShadow('');
+  }, []);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
@@ -35,6 +49,7 @@ function Logo3DText({ siteName }: { siteName?: string }) {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, [handleMouseMove, handleMouseLeave]);
 

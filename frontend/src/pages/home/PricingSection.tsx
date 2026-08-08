@@ -15,7 +15,26 @@ export default function PricingSection({ plans }: PricingSectionProps) {
   const { t, i18n } = useTranslation(['pages']);
   const lang = i18n.language as 'id' | 'en';
   const { ref, inView } = useInView(0.1);
-  if (plans.length === 0) return null;
+  // Render a skeleton while plans are loading to prevent CLS (layout shift).
+  // Returning null here would cause the section to pop in after the API call,
+  // shifting all content below it down — a major CLS contributor.
+  if (plans.length === 0) {
+    return (
+      <section className="section-padding bg-[#0f172a] text-white" aria-hidden="true">
+        <div className="container-custom">
+          <div className="text-center space-y-3 animate-pulse">
+            <div className="h-8 w-48 bg-slate-700 rounded mx-auto" />
+            <div className="h-4 w-72 bg-slate-800 rounded mx-auto" />
+          </div>
+          <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto animate-pulse">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="rounded-2xl bg-slate-800 h-96" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

@@ -103,9 +103,12 @@ export default function Footer() {
         <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© {year} {settings.siteName || 'ViviDev.id'}. {t('footer.rights')}</p>
           <div className="flex gap-4">
-            <Link to="/sitemap.xml" className="hover:text-white transition-colors">
+            {/* Use <a> not <Link> — sitemap.xml is a static file served by the
+                web server, not a React route. Link would do a client-side
+                navigation that returns 404 from the SPA router. */}
+            <a href="/sitemap.xml" className="hover:text-white transition-colors">
               Sitemap
-            </Link>
+            </a>
           </div>
         </div>
       </div>
