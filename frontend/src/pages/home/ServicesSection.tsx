@@ -174,7 +174,7 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
   if (services.length === 0) {
     return (
       <section
-        className="section-padding overflow-hidden lg:min-h-[700px]"
+        className="section-padding overflow-hidden min-h-[900px] lg:min-h-[700px]"
         style={{ background: 'linear-gradient(160deg, #90CAF9 0%, #E3F2FD 50%, #90CAF9 100%)' }}
         aria-hidden="true"
       >

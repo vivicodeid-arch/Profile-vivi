@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Code2, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { SUPPORT_EMAIL, WA_NUMBER } from '../../lib/constants';
 import { getOptUrl } from '../../lib/images';
@@ -37,14 +37,12 @@ export default function Footer() {
       className="text-gray-100 min-h-[300px]"
       style={{
         backgroundColor: '#0B1849',
-        // Do NOT use contentVisibility:auto on the footer.
-        // containIntrinsicSize:'0 Xpx' tells the browser the element is 0px
-        // tall before it renders, so the layout engine positions everything
-        // above it as if the footer doesn't exist. When the footer eventually
-        // renders it pushes everything up — exactly the shift DevTools traced
-        // at 1,405 ms on footer.text-gray-100 (CLS 0.40).
-        // min-h-[300px] on the className already reserves the space statically,
-        // so content-visibility optimisation is unnecessary here.
+        // Reinforce min-height as an inline style so the browser enforces it
+        // immediately when React hydrates, regardless of when the Tailwind CSS
+        // bundle is parsed. The app-shell footer placeholder in index.html uses
+        // the same 300px value, so the reserved space is continuous across the
+        // pre-hydration → post-hydration transition with no shift.
+        minHeight: '300px',
       }}
     >
       <div className="container-custom py-12 lg:py-16">
@@ -53,24 +51,19 @@ export default function Footer() {
           {/* Brand */}
           <div className="min-h-[120px]">
             <Link to="/" className="flex items-center gap-2 font-bold text-xl text-white mb-4 h-8">
-              {settings.logoUrl ? (
-                <img
-                  src={getOptUrl(settings.logoUrl, 320)}
-                  alt={settings.siteName || 'Logo'}
-                  className="h-full max-w-[140px] object-contain"
-                  width={140}
-                  height={32}
-                  loading="lazy"
-                />
-              ) : (
-                <>
-                  <Code2 className="w-6 h-6 text-primary-400" aria-hidden="true" />
-                  <span>
-                    {settings.siteName || 'ViviDev'}
-                    <span className="text-primary-400">.id</span>
-                  </span>
-                </>
-              )}
+              {/* Always render <img> so the layout box is stable before and after
+                  fetchSettings() resolves. Switching between <img> and <Code2+span>
+                  changes the element tree and height, causing a layout shift at
+                  ~310 ms when logoUrl arrives from the CMS — the primary CLS culprit.
+                  Fallback to /favicon.png so the img is never a blank slot. */}
+              <img
+                src={settings.logoUrl ? getOptUrl(settings.logoUrl, 320) : '/favicon.png'}
+                alt={settings.siteName || 'ViviDev.id'}
+                className="h-full max-w-[140px] object-contain"
+                width={140}
+                height={32}
+                loading="eager"
+              />
             </Link>
             <p className="text-sm text-gray-300 leading-relaxed">
               {t('footer.tagline')}

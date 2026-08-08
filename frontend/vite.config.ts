@@ -78,15 +78,6 @@ export default defineConfig({
             return 'i18n';
           }
 
-          // ── Core React vendor ──────────────────────────────────────────────
-          if (
-            id.includes('node_modules/react/') ||
-            id.includes('node_modules/react-dom/') ||
-            id.includes('node_modules/react-router-dom/')
-          ) {
-            return 'vendor-react';
-          }
-
           // ── Remaining node_modules → shared vendor chunk ───────────────────
           if (id.includes('node_modules')) {
             return 'vendor';

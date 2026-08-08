@@ -49,9 +49,12 @@ function PageLoader() {
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header & Footer are eagerly imported — they render immediately without
-          waiting for the lazy page chunk to resolve, which keeps the shell
-          visible during navigation and prevents blank-screen flashes. */}
+      {/* Header, Footer, WhatsAppButton are outside Suspense so they are never
+          unmounted while lazy page chunks are loading. The outer Suspense in
+          App wraps only isAdmin routes; the inner Suspense here covers public
+          lazy pages only — keeping Footer stable in the DOM at all times.
+          Unmounting Footer during Suspense fallback was the root cause of
+          CLS 0.40: footer rect went to {0,0,0,0} then reappeared shifted. */}
       <Header />
       <main className="flex-grow">
         <Suspense fallback={<PageLoader />}>

@@ -71,66 +71,7 @@
     </script>
   </head>
   <body>
-    <div id="root">
-      <!-- App Shell: Eliminates LCP Element Render Delay by painting immediately before React hydration -->
-      <style>
-        .app-shell {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #0D47A1 0%, #1565C0 25%, #1976D2 50%, #0D47A1 75%, #0a3880 100%);
-          display: flex;
-          align-items: center;
-          padding-top: 5rem;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          overflow: hidden;
-          position: relative;
-        }
-        .app-shell-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 3rem 1rem;
-          width: 100%;
-          position: relative;
-          z-index: 10;
-        }
-        .app-shell-badge {
-          display: inline-block;
-          padding: 6px 16px;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: 1.5rem;
-          background-color: rgba(144, 202, 249, 0.12);
-          border: 1px solid rgba(144, 202, 249, 0.30);
-          color: #90CAF9;
-        }
-        .app-shell-h1 {
-          color: white;
-          font-size: 2.25rem;
-          font-weight: 700;
-          line-height: 1.25;
-          margin-bottom: 1.5rem;
-          max-width: 42rem;
-        }
-        @media (min-width: 1024px) {
-          .app-shell-h1 { font-size: 3rem; }
-        }
-        @media (min-width: 1280px) {
-          .app-shell-h1 { font-size: 3.75rem; }
-        }
-      </style>
-      <div class="app-shell" aria-hidden="true">
-        <div class="app-shell-content">
-          <div style="max-width: 42rem;">
-            <div class="app-shell-badge">Web Developer Profesional</div>
-            <h1 class="app-shell-h1">
-              Bangun Website Profesional untuk Bisnis Anda
-            </h1>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
