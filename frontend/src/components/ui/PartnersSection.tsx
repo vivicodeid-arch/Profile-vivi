@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import api from '../../services/api';
+import { useApi } from '../../hooks/useApi';
 
 interface Partner {
   id: string;
@@ -9,13 +8,19 @@ interface Partner {
 }
 
 export default function PartnersSection() {
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const { data: partners, isLoading } = useApi<Partner[]>('/partners');
 
-  useEffect(() => {
-    api.get('/partners').then(r => setPartners(r.data.data || [])).catch(() => {});
-  }, []);
+  if (isLoading) {
+    return (
+      <section className="py-12 bg-white dark:bg-gray-950 border-y border-gray-100 dark:border-gray-800 overflow-hidden min-h-[160px]" aria-hidden="true">
+        <div className="container-custom mb-8 text-center animate-pulse">
+          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded mx-auto" />
+        </div>
+      </section>
+    );
+  }
 
-  if (partners.length === 0) return null;
+  if (!partners || partners.length === 0) return null;
 
   // Duplicate for seamless infinite scroll
   const doubled = [...partners, ...partners];
