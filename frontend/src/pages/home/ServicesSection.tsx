@@ -167,10 +167,45 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
 
   const visibleServices = services.slice(0, 4);
 
+  // Render a fixed-height skeleton while services data is loading.
+  // Without this the section collapses to near-zero height on initial render,
+  // then expands when API data arrives — the primary CLS contributor on this page.
+  // The skeleton matches lg:min-h-[700px] so the footer position stays stable.
+  if (services.length === 0) {
+    return (
+      <section
+        className="section-padding overflow-hidden lg:min-h-[700px]"
+        style={{ background: 'linear-gradient(160deg, #90CAF9 0%, #E3F2FD 50%, #90CAF9 100%)' }}
+        aria-hidden="true"
+      >
+        <div className="container-custom">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center animate-pulse">
+            {/* Text column skeleton */}
+            <div className="order-2 lg:order-1 space-y-4">
+              <div className="h-5 w-40 bg-blue-200/60 rounded" />
+              <div className="h-10 w-3/4 bg-blue-300/50 rounded" />
+              <div className="h-4 w-full bg-blue-200/40 rounded" />
+              <div className="h-4 w-5/6 bg-blue-200/40 rounded" />
+              {/* Node diagram placeholder */}
+              <div className="relative mx-auto mt-6" style={{ width: 320, height: 260 }}>
+                <div className="absolute inset-0 rounded-3xl bg-blue-200/30" />
+              </div>
+              <div className="h-10 w-36 bg-blue-400/40 rounded-xl mt-4" />
+            </div>
+            {/* Image column skeleton */}
+            <div className="order-1 lg:order-2">
+              <div className="w-full aspect-[4/3] bg-blue-200/40 rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       ref={ref}
-      className="section-padding overflow-hidden lg:min-h-[700px]"
+      className="section-padding overflow-hidden min-h-[900px] lg:min-h-[700px]"
       style={{ background: 'linear-gradient(160deg, #90CAF9 0%, #E3F2FD 50%, #90CAF9 100%)' }}
       aria-labelledby="services-heading"
     >

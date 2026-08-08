@@ -10,6 +10,12 @@ import { useApi } from './useApi';
  * that would otherwise compete with the LCP element for network bandwidth and
  * main-thread time during the critical first 800 ms.
  *
+ * CLS note: isLoading is initialised to FALSE (not true) so that consumers
+ * can distinguish "not yet scheduled" from "fetching". Skeleton components
+ * should treat `data === null && !isLoading` as the pre-fetch idle state and
+ * render a fixed-height placeholder immediately, preventing layout collapse
+ * before the deferred fetch even starts.
+ *
  * @param url     - API endpoint, passed straight through to useApi
  * @param delayMs - maximum wait before forcing the fetch (default 300 ms)
  *
@@ -41,5 +47,16 @@ export function useDeferredApi<T>(url: string, delayMs = 300) {
     };
   }, [url, delayMs]);
 
-  return useApi<T>(activeUrl);
+  const result = useApi<T>(activeUrl);
+
+  // When activeUrl is still '' the fetch has not been scheduled yet.
+  // useApi returns isLoading:true even for an empty url (initial state), which
+  // would make every consumer think a request is in flight before it ever
+  // starts. Return isLoading:false until the real url is activated so skeleton
+  // components can render a stable placeholder without a loading spinner.
+  if (!activeUrl) {
+    return { ...result, isLoading: false };
+  }
+
+  return result;
 }

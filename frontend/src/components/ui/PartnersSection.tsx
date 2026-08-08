@@ -1,4 +1,4 @@
-import { useApi } from '../../hooks/useApi';
+import { useDeferredApi } from '../../hooks/useDeferredApi';
 import { getOptUrl } from '../../lib/images';
 
 interface Partner {
@@ -9,7 +9,11 @@ interface Partner {
 }
 
 export default function PartnersSection() {
-  const { data: partners, isLoading } = useApi<Partner[]>('/partners');
+  // useDeferredApi defers the fetch until the browser is idle, keeping
+  // the partners request out of the critical LCP window. It also returns
+  // isLoading:false before the fetch is scheduled so the stable placeholder
+  // below is painted immediately and never causes a layout shift.
+  const { data: partners, isLoading } = useDeferredApi<Partner[]>('/partners');
 
   // Keep a stable section in the DOM while loading or when there are no
   // partners. Returning null would yank the element out and shift all content

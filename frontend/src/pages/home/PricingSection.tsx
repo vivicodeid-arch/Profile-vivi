@@ -20,7 +20,7 @@ export default function PricingSection({ plans }: PricingSectionProps) {
   // shifting all content below it down — a major CLS contributor.
   if (plans.length === 0) {
     return (
-      <section className="section-padding bg-[#0f172a] text-white" aria-hidden="true">
+      <section className="section-padding bg-[#0f172a] text-white min-h-[1900px] md:min-h-[1200px] lg:min-h-[1000px]" aria-hidden="true">
         <div className="container-custom">
           <div className="text-center space-y-3 animate-pulse">
             <div className="h-8 w-48 bg-slate-700 rounded mx-auto" />
@@ -39,7 +39,7 @@ export default function PricingSection({ plans }: PricingSectionProps) {
   return (
     <section
       ref={ref}
-      className="section-padding bg-[#0f172a] text-white lg:min-h-[1000px]"
+      className="section-padding bg-[#0f172a] text-white min-h-[1900px] md:min-h-[1200px] lg:min-h-[1000px]"
       aria-labelledby="pricing-heading"
     >
       <div className="container-custom">

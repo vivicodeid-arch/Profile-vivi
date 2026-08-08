@@ -37,8 +37,14 @@ export default function Footer() {
       className="text-gray-100 min-h-[300px]"
       style={{
         backgroundColor: '#0B1849',
-        contentVisibility: 'auto',
-        containIntrinsicSize: '0 300px',
+        // Do NOT use contentVisibility:auto on the footer.
+        // containIntrinsicSize:'0 Xpx' tells the browser the element is 0px
+        // tall before it renders, so the layout engine positions everything
+        // above it as if the footer doesn't exist. When the footer eventually
+        // renders it pushes everything up — exactly the shift DevTools traced
+        // at 1,405 ms on footer.text-gray-100 (CLS 0.40).
+        // min-h-[300px] on the className already reserves the space statically,
+        // so content-visibility optimisation is unnecessary here.
       }}
     >
       <div className="container-custom py-12 lg:py-16">

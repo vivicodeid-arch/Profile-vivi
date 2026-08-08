@@ -29,16 +29,6 @@ const orgSchema = {
   },
 };
 
-// Inline style shared by all below-fold section wrappers.
-// content-visibility:auto lets the browser skip rendering off-screen
-// subtrees, freeing main-thread time during LCP. containIntrinsicSize
-// provides a height estimate so the layout engine can reserve space
-// without actually rendering the children.
-const BELOW_FOLD_STYLE: React.CSSProperties = {
-  contentVisibility: 'auto',
-  containIntrinsicSize: '0 700px',
-};
-
 export default function Home() {
   // Defer non-critical API calls until after the browser is idle so they
   // don't compete with LCP resources in the critical 0–800 ms window.
@@ -57,22 +47,17 @@ export default function Home() {
       {/* Critical above-fold content — rendered immediately */}
       <HeroSection />
       <StatsSection />
-      <ServicesSection services={services ?? []} />
       <AboutSection />
 
       {/* Below-fold sections — browser may skip rendering until scrolled into view */}
-      <div style={BELOW_FOLD_STYLE}>
-        <PricingSection plans={plans ?? []} />
-      </div>
-      <div style={BELOW_FOLD_STYLE}>
-        <WorkProcessSection />
-      </div>
-      <div style={BELOW_FOLD_STYLE}>
-        <PartnersSection />
-      </div>
-      <div style={BELOW_FOLD_STYLE}>
-        <CtaSection />
-      </div>
+      {/* ServicesSection moved below fold: it depends on deferred API data and
+          its own skeleton reserves the correct height, so content-visibility
+          containment here prevents any off-screen rendering cost. */}
+      <ServicesSection services={services ?? []} />
+      <PricingSection plans={plans ?? []} />
+      <WorkProcessSection />
+      <PartnersSection />
+      <CtaSection />
     </>
   );
 }
