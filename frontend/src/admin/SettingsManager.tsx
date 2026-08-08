@@ -234,7 +234,8 @@ export default function SettingsManager() {
 
       {error   && <ErrorAlert message={error} />}
       {success && (
-        <div className="rounded-lg border border-green-700 bg-green-900/30 px-4 py-3 text-sm text-green-300">
+        <div className="fixed bottom-6 right-6 z-50 rounded-lg border border-green-700 bg-green-900 px-5 py-3 text-sm text-green-300 shadow-xl flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
           Pengaturan berhasil disimpan.
         </div>
       )}

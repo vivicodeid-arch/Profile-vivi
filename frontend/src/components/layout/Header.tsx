@@ -98,7 +98,6 @@ export default function Header() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const { settings } = useSettingsStore();
@@ -107,7 +106,6 @@ export default function Header() {
   useEffect(() => {
     const handler = () => {
       const currentY = window.scrollY;
-      setScrolled(currentY > 20);
       // hide when scrolling down past 80px, show when scrolling up
       if (currentY > 80) {
         setVisible(currentY < lastScrollY.current);
