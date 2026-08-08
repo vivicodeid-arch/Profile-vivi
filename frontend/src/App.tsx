@@ -48,19 +48,19 @@ function PageLoader() {
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {/* Header & Footer are eagerly imported — they render immediately without
           waiting for the lazy page chunk to resolve, which keeps the shell
           visible during navigation and prevents blank-screen flashes. */}
       <Header />
-      <main>
+      <main className="flex-grow">
         <Suspense fallback={<PageLoader />}>
           {children}
         </Suspense>
       </main>
       <Footer />
       <WhatsAppButton />
-    </>
+    </div>
   );
 }
 
