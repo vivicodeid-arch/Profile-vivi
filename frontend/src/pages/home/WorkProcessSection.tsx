@@ -69,29 +69,26 @@ export default function WorkProcessSection({ steps = defaultSteps }: WorkProcess
         </div>
 
         {/* Timeline Container */}
-        <div className="relative max-w-6xl mx-auto lg:pt-32 lg:pb-32">
+        <div className="relative max-w-6xl mx-auto mt-16">
           
           {/* Horizontal Line for Desktop */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
+          <div className="hidden lg:block absolute top-8 left-0 right-0 h-0.5 bg-slate-200 dark:bg-slate-700 z-0"></div>
 
           {/* Vertical Line for Mobile */}
-          <div className="block lg:hidden absolute top-0 bottom-0 left-8 w-0.5 bg-slate-200 dark:bg-slate-700 z-0"></div>
+          <div className="block lg:hidden absolute top-0 bottom-0 left-[1.9rem] w-0.5 bg-slate-200 dark:bg-slate-700 z-0"></div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-6 gap-10 lg:gap-0 relative z-10">
-            {steps.map((step, index) => {
-              const isTop = index % 2 === 0;
-              
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 lg:gap-6 relative z-10">
+            {steps.map((step) => {
               return (
-                <div key={step.id} className="relative flex lg:block items-start lg:items-center">
+                <div key={step.id} className="relative flex lg:flex-col items-start lg:items-center">
                   
-                  {/* Content for Mobile (always on right of circle) & Desktop (alternating top/bottom) */}
-                  <div className={`
-                    pl-20 lg:pl-0 lg:absolute lg:w-[150%] lg:left-1/2 lg:-translate-x-1/2
-                    ${isTop 
-                      ? 'lg:bottom-full lg:mb-12 lg:text-center' 
-                      : 'lg:top-full lg:mt-12 lg:text-center'
-                    }
-                  `}>
+                  {/* Circle Number */}
+                  <div className="w-16 h-16 shrink-0 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] border-4 border-slate-50 dark:border-slate-900 z-10 transition-transform duration-300 hover:scale-110">
+                    {String(step.id).padStart(2, '0')}
+                  </div>
+
+                  {/* Content for Mobile (right of circle) & Desktop (below circle) */}
+                  <div className="pl-6 lg:pl-0 lg:mt-8 lg:text-center">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight">
                       {step.title}
                     </h3>
@@ -100,16 +97,6 @@ export default function WorkProcessSection({ steps = defaultSteps }: WorkProcess
                     </p>
                   </div>
 
-                  {/* Circle Number */}
-                  <div className="absolute left-0 lg:static lg:mx-auto w-16 h-16 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] border-4 border-slate-50 dark:border-slate-900 z-10 transition-transform duration-300 hover:scale-110">
-                    {String(step.id).padStart(2, '0')}
-                  </div>
-
-                  {/* Vertical Connector Line for Desktop */}
-                  <div className={`
-                    hidden lg:block absolute left-1/2 w-[2px] bg-slate-200 dark:bg-slate-700 -translate-x-1/2
-                    ${isTop ? 'bottom-1/2 h-10 mb-8' : 'top-1/2 h-10 mt-8'}
-                  `}></div>
                 </div>
               );
             })}
