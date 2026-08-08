@@ -37,6 +37,8 @@ export default function Footer() {
                   src={settings.logoUrl}
                   alt={settings.siteName || 'Logo'}
                   className="h-8 max-w-[140px] object-contain"
+                  width={200}
+                  height={50}
                 />
               ) : (
                 <>

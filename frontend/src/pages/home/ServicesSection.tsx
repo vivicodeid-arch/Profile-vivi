@@ -255,6 +255,8 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
                 alt="Layanan Kami"
                 className="relative z-10 w-full h-auto object-contain drop-shadow-2xl"
                 loading="lazy"
+                width={800}
+                height={640}
               />
             </div>
           </div>

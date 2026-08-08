@@ -174,10 +174,12 @@ server {
         proxy_cache_bypass \$http_upgrade;
     }
 
-    # Uploads
+    # Uploads (UUID filenames are immutable → cache for a year)
     location /uploads/ {
         proxy_pass http://127.0.0.1:5000;
         proxy_set_header Host \$host;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
     }
 
     # Sitemap & robots

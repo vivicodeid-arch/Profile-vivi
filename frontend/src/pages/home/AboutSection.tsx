@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useInView } from '../../hooks/useInView';
+import { responsiveSrc } from '../../lib/images';
 
 const DEFAULT_FEATURES = [
   'Website berkualitas',
@@ -19,6 +20,7 @@ const DEFAULT_FEATURES = [
 export default function AboutSection() {
   const { settings } = useSettingsStore();
   const { ref, inView } = useInView(0.1);
+  const aboutImg = responsiveSrc(settings.aboutHomeImage || '/hero-mockup.png');
 
   const features = [
     settings.aboutHomeFeature1 || DEFAULT_FEATURES[0],
@@ -48,11 +50,13 @@ export default function AboutSection() {
           >
             <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl -translate-x-1/4 -translate-y-1/4" />
             <img
-              src={settings.aboutHomeImage || '/hero-mockup.png'}
+              src={aboutImg.src}
+              srcSet={aboutImg.srcSet}
               alt="ViviDev Web Design Mockup"
-              className="relative z-10 w-full h-auto object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
-              width={600}
-              height={450}
+              className="relative w-full aspect-[11/6] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
+              loading="eager"
+              width={1440}
+              height={785}
             />
           </div>
 

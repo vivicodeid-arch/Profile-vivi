@@ -169,7 +169,7 @@ export default function Header() {
             >
               {settings.logoUrl ? (
                 <Tilt3D>
-                  <img src={settings.logoUrl} alt={settings.siteName || 'Logo'} className="h-[28px] max-w-[130px] object-contain" />
+                  <img src={settings.logoUrl} alt={settings.siteName || 'Logo'} className="h-[28px] max-w-[130px] object-contain" width={200} height={50} />
                 </Tilt3D>
               ) : (
                 <>

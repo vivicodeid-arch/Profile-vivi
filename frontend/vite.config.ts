@@ -1,9 +1,34 @@
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// ---------------------------------------------------------------------------
+// Strip modulepreload hints for admin chunks from the built index.html.
+//
+// Vite injects `<link rel="modulepreload">` for every chunk reachable from
+// the entry point — including lazy-loaded admin chunks. That causes browsers
+// to eagerly download the admin editor (~110 KB) and admin shell (~27 KB) on
+// every public page visit, even though they're only needed behind /admin.
+//
+// This plugin removes those specific modulepreload tags after Vite generates
+// the HTML, keeping preloads only for public-facing chunks (vendor, react,
+// i18n) which are needed on every page.
+// ---------------------------------------------------------------------------
+function stripAdminPreloads(): Plugin {
+  return {
+    name: 'strip-admin-modulepreloads',
+    transformIndexHtml(html) {
+      // Remove modulepreload for any chunk whose filename starts with "admin"
+      return html.replace(
+        /<link rel="modulepreload"[^>]*href="[^"]*\/admin[^"]*"[^>]*>\n?/g,
+        '',
+      );
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), stripAdminPreloads()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

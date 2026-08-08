@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Code2, Zap, Globe } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useTilt } from '../../hooks/useTilt';
+import { responsiveSrc } from '../../lib/images';
 
 // ---------------------------------------------------------------------------
 // Particles — floating dots dalam palet biru
@@ -113,6 +114,8 @@ export default function HeroSection() {
         untuk Bisnis Anda
       </>
     );
+
+  const heroImg = responsiveSrc(settings.heroImageUrl || '/hero-mockup.png');
 
   return (
     <section
@@ -290,9 +293,12 @@ export default function HeroSection() {
               style={{ transformStyle: 'preserve-3d', willChange: 'transform', display: 'inline-block' }}
             >
               <img
-                src={settings.heroImageUrl || '/hero-mockup.png'}
+                src={heroImg.src}
+                srcSet={heroImg.srcSet}
                 alt="Website Mockup"
-                className="relative z-10 w-full max-w-[560px] h-auto object-contain drop-shadow-2xl"
+                className="relative z-10 w-full max-w-[560px] aspect-[5/4] object-contain drop-shadow-2xl"
+                loading="eager"
+                fetchPriority="high"
               />
             </div>
           </div>

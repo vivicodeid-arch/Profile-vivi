@@ -19,6 +19,7 @@ import teamRoutes from './routes/team.routes';
 import contactRoutes from './routes/contact.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import mediaRoutes from './routes/media.routes';
+import optimizedImageRoutes from './routes/optimized-image.routes';
 import sitemapRoutes from './routes/sitemap.routes';
 import settingsRoutes from './routes/settings.routes';
 import partnersRoutes from './routes/partners.routes';
@@ -81,8 +82,14 @@ app.use(sanitizeInput);
 // Rate limiting
 app.use('/api/', generalLimiter);
 
+// On-demand image resize proxy (mounted BEFORE the static handler so it can
+// intercept /uploads/opt/:width/:filename and serve generated WebP variants).
+app.use('/uploads', optimizedImageRoutes);
+
 // Static file serving for uploads
-app.use('/uploads', express.static(path.resolve(env.UPLOAD_DIR), { maxAge: '1d' }));
+// maxAge '1y' + immutable: every uploaded file is named by a UUID, so once
+// created its contents never change — safe to cache for a year.
+app.use('/uploads', express.static(path.resolve(env.UPLOAD_DIR), { maxAge: '1y', immutable: true }));
 
 // Sitemap & robots (must be before /api prefix)
 app.use('/', sitemapRoutes);
