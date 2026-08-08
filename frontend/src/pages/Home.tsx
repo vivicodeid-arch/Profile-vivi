@@ -7,7 +7,7 @@ import ServicesSection from './home/ServicesSection';
 import PricingSection from './home/PricingSection';
 import WorkProcessSection from './home/WorkProcessSection';
 import CtaSection from './home/CtaSection';
-import { useApi } from '../hooks/useApi';
+import { useDeferredApi } from '../hooks/useDeferredApi';
 import type { Service, PricingPlan } from '../types';
 import { SITE_NAME, SITE_URL } from '../lib/constants';
 
@@ -29,9 +29,21 @@ const orgSchema = {
   },
 };
 
+// Inline style shared by all below-fold section wrappers.
+// content-visibility:auto lets the browser skip rendering off-screen
+// subtrees, freeing main-thread time during LCP. containIntrinsicSize
+// provides a height estimate so the layout engine can reserve space
+// without actually rendering the children.
+const BELOW_FOLD_STYLE: React.CSSProperties = {
+  contentVisibility: 'auto',
+  containIntrinsicSize: '0 700px',
+};
+
 export default function Home() {
-  const { data: services } = useApi<Service[]>('/services');
-  const { data: plans }    = useApi<PricingPlan[]>('/pricing');
+  // Defer non-critical API calls until after the browser is idle so they
+  // don't compete with LCP resources in the critical 0–800 ms window.
+  const { data: services } = useDeferredApi<Service[]>('/services');
+  const { data: plans }    = useDeferredApi<PricingPlan[]>('/pricing');
 
   return (
     <>
@@ -42,14 +54,25 @@ export default function Home() {
         schema={orgSchema}
       />
 
+      {/* Critical above-fold content — rendered immediately */}
       <HeroSection />
       <StatsSection />
       <ServicesSection services={services ?? []} />
       <AboutSection />
-      <PricingSection plans={plans ?? []} />
-      <WorkProcessSection />
-      <PartnersSection />
-      <CtaSection />
+
+      {/* Below-fold sections — browser may skip rendering until scrolled into view */}
+      <div style={BELOW_FOLD_STYLE}>
+        <PricingSection plans={plans ?? []} />
+      </div>
+      <div style={BELOW_FOLD_STYLE}>
+        <WorkProcessSection />
+      </div>
+      <div style={BELOW_FOLD_STYLE}>
+        <PartnersSection />
+      </div>
+      <div style={BELOW_FOLD_STYLE}>
+        <CtaSection />
+      </div>
     </>
   );
 }

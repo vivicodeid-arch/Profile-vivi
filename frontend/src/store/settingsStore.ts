@@ -126,7 +126,10 @@ const DEFAULT_SETTINGS: SiteSettings = {
 
 export const useSettingsStore = create<SettingsState>((set) => ({
   settings: DEFAULT_SETTINGS,
-  isLoading: true,
+  // Start as false — DEFAULT_SETTINGS provides safe fallbacks for every key,
+  // so components can render immediately and update in-place when the API
+  // responds. This eliminates the skeleton → content height shift (CLS).
+  isLoading: false,
 
   fetchSettings: async () => {
     set({ isLoading: true });
