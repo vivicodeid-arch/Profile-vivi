@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useInView } from '../../hooks/useInView';
+import { getOptUrl } from '../../lib/images';
 
 const FADE_MS = 1000;
 
@@ -48,7 +49,7 @@ function CtaSlideshow({ images, intervalMs }: CtaSlideshowProps) {
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity"
         style={{
-          backgroundImage: `url(${images[current]})`,
+          backgroundImage: `url(${getOptUrl(images[current], 1200)})`,
           opacity:         transitioning ? 0 : 1,
           transitionDuration: `${FADE_MS}ms`,
         }}
@@ -57,7 +58,7 @@ function CtaSlideshow({ images, intervalMs }: CtaSlideshowProps) {
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity"
         style={{
-          backgroundImage: `url(${images[next]})`,
+          backgroundImage: `url(${getOptUrl(images[next], 1200)})`,
           opacity:         transitioning ? 1 : 0,
           transitionDuration: `${FADE_MS}ms`,
         }}
