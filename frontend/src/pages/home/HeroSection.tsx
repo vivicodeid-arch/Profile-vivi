@@ -176,10 +176,9 @@ export default function HeroSection() {
               Web Developer Profesional
             </div>
 
-            {/* H1 */}
+            {/* H1 - No fade in, allows App Shell to handoff seamlessly and secures LCP */}
             <h1
               className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6"
-              style={fadeIn('200ms')}
             >
               {heroTitle}
             </h1>
