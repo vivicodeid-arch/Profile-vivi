@@ -20,13 +20,13 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
-  // Email SMTP
-  SMTP_HOST: z.string().min(1),
+  // Email SMTP (optional)
+  SMTP_HOST: z.string().min(1).optional(),
   SMTP_PORT: z.string().default('465').transform(Number),
-  SMTP_USER: z.string().email(),
-  SMTP_PASS: z.string().min(1),
+  SMTP_USER: z.string().email().optional(),
+  SMTP_PASS: z.string().min(1).optional(),
   SMTP_SECURE: z.string().default('true').transform(v => v === 'true'),
-  CONTACT_EMAIL_TO: z.string().email(),
+  CONTACT_EMAIL_TO: z.string().email().optional(),
 
   // WhatsApp
   WA_NUMBER: z.string().default('6285798112370'),

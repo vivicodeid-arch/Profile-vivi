@@ -16,7 +16,7 @@ import type { HeroPosition, HeroType } from '../lib/constants';
 // tanpa menunggu API. API tetap dipanggil di background untuk update stale data.
 // ---------------------------------------------------------------------------
 
-const CACHE_KEY    = 'vividev_settings_cache';
+const CACHE_KEY    = 'vividev_settings_cache_v2';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 jam — revalidate di background setelahnya
 
 interface CacheEntry {

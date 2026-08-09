@@ -75,7 +75,7 @@ const updateSettingsSchema = z.object({
 router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const settings = await prisma.setting.findMany();
-    const settingsMap = settings.reduce((acc, curr) => {
+    const settingsMap = settings.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);
@@ -98,7 +98,7 @@ router.put("/", authenticate, async (req: Request, res: Response, next: NextFunc
     if (updates.length > 0) await prisma.$transaction(updates as any);
 
     const newSettings = await prisma.setting.findMany();
-    const settingsMap = newSettings.reduce((acc, curr) => {
+    const settingsMap = newSettings.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);
