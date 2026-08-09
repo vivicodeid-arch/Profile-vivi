@@ -37,7 +37,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         imgSrc: ["'self'", 'data:', 'https:'],
@@ -110,7 +110,7 @@ app.use('/api/about-content', aboutContentRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), env: env.NODE_ENV });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // 404 handler

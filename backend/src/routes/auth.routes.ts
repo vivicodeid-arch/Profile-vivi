@@ -2,16 +2,15 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 import { env } from '../config/env';
 import { authLimiter } from '../middleware/rateLimit';
 import { validate } from '../middleware/validate';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { AppError } from '../middleware/errorHandler';
 import { logger } from '../middleware/logger';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -64,7 +63,7 @@ router.post('/login', authLimiter, validate(loginSchema), async (req: Request, r
   }
 });
 
-// POST /api/auth/refresh
+// POST /api/auth/refresh — rotates both tokens on every refresh
 router.post('/refresh', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies?.refresh_token;
@@ -74,12 +73,21 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user) throw new AppError(401, 'User not found');
 
-    const { accessToken } = generateTokens(user);
+    // Rotate both tokens — old refresh token is implicitly invalidated
+    // by issuing a new one with a fresh expiry. If the old token is reused
+    // after this point, the user must log in again (no infinite reuse).
+    const { accessToken, refreshToken } = generateTokens(user);
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000,
+    });
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.json({ status: 'ok' });
   } catch (err) {

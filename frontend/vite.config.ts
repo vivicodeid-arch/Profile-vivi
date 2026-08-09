@@ -78,7 +78,30 @@ export default defineConfig({
             return 'i18n';
           }
 
+          // ── React core — harus tersedia sebelum apapun bisa render ─────────
+          // Pisahkan dari vendor agar browser bisa parallel-preload chunk ini
+          // bersama dengan chunk halaman utama. Memotong ~15-25ms parse time
+          // dari critical path karena chunk lebih kecil dan lebih fokus.
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
+          ) {
+            return 'react-core';
+          }
+
+          // ── Router — dibutuhkan di setiap halaman public ───────────────────
+          if (id.includes('node_modules/react-router')) {
+            return 'router';
+          }
+
+          // ── State management — zustand sangat kecil, gabung dengan router ──
+          if (id.includes('node_modules/zustand')) {
+            return 'router';
+          }
+
           // ── Remaining node_modules → shared vendor chunk ───────────────────
+          // (lucide-react, axios, dll — dibutuhkan tapi tidak sekritis react core)
           if (id.includes('node_modules')) {
             return 'vendor';
           }

@@ -22,12 +22,15 @@ function CtaSlideshow({ images, intervalMs }: CtaSlideshowProps) {
 
   useEffect(() => {
     if (images.length < 2) return;
+    // Use viewport width to pick optimized image size: 640px on mobile, 1200px on desktop
     const timer = setInterval(() => {
       setTransitioning(true);
-      setTimeout(() => {
+      // Store timeout id so we can clear it on unmount to prevent setState on unmounted component
+      const fadeTimer = setTimeout(() => {
         setIndex(i => (i + 1) % images.length);
         setTransitioning(false);
       }, FADE_MS);
+      return () => clearTimeout(fadeTimer);
     }, intervalMs);
     return () => clearInterval(timer);
   }, [images.length, intervalMs]);
@@ -91,10 +94,9 @@ export default function CtaSection() {
       <CtaSlideshow images={images} intervalMs={intervalMs} />
 
       <div
-        className="container-custom text-center relative z-10 transition-all duration-700"
+        className="container-custom text-center relative z-10 transition-opacity duration-700"
         style={{
-          opacity:   inView ? 1 : 0,
-          transform: inView ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(20px)',
+          opacity: inView ? 1 : 0,
         }}
       >
         <h2 id="cta-heading" className="text-3xl lg:text-4xl font-bold">

@@ -14,10 +14,12 @@ const NAV_LINKS = [
   { to: '/contact',   key: 'nav.contact'   },
 ];
 
+// Computed once at module load time — no need to recompute on every render
+const CURRENT_YEAR = new Date().getFullYear();
+
 export default function Footer() {
   const { t } = useTranslation();
   const { settings } = useSettingsStore();
-  const year = new Date().getFullYear();
 
   // Prefer CMS values, fall back to compile-time constants.
   // No isLoading check needed — settingsStore.isLoading starts as false and
@@ -118,7 +120,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400 min-h-[64px]">
-          <p>© {year} {settings.siteName || 'ViviDev.id'}. {t('footer.rights')}</p>
+          <p>© {CURRENT_YEAR} {settings.siteName || 'ViviDev.id'}. {t('footer.rights')}</p>
           <div className="flex gap-4">
             {/* Use <a> not <Link> — sitemap.xml is a static file served by the
                 web server, not a React route. Link would do a client-side

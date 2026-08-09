@@ -21,10 +21,10 @@ export default function Dashboard() {
   );
 
   const stats = [
-    { label: 'Views Hari Ini', value: data?.pageViews.today ?? 0, icon: Eye, color: 'bg-blue-500' },
-    { label: 'Views 7 Hari', value: data?.pageViews.last7Days ?? 0, icon: TrendingUp, color: 'bg-green-500' },
-    { label: 'Views 30 Hari', value: data?.pageViews.last30Days ?? 0, icon: Users, color: 'bg-purple-500' },
-    { label: 'Pesan Belum Dibaca', value: data?.contacts.unread ?? 0, icon: MessageSquare, color: 'bg-orange-500' },
+    { label: 'Views Hari Ini', value: data?.pageViews.today ?? 0, icon: Eye, bg: 'bg-blue-500/20', text: 'text-blue-400' },
+    { label: 'Views 7 Hari', value: data?.pageViews.last7Days ?? 0, icon: TrendingUp, bg: 'bg-green-500/20', text: 'text-green-400' },
+    { label: 'Views 30 Hari', value: data?.pageViews.last30Days ?? 0, icon: Users, bg: 'bg-purple-500/20', text: 'text-purple-400' },
+    { label: 'Pesan Belum Dibaca', value: data?.contacts.unread ?? 0, icon: MessageSquare, bg: 'bg-orange-500/20', text: 'text-orange-400' },
   ];
 
   return (
@@ -36,12 +36,12 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map(({ label, value, icon: Icon, color }) => (
+        {stats.map(({ label, value, icon: Icon, bg, text }) => (
           <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-400">{label}</p>
-              <div className={`w-10 h-10 ${color} bg-opacity-20 rounded-lg flex items-center justify-center`}>
-                <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} aria-hidden="true" />
+              <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center`}>
+                <Icon className={`w-5 h-5 ${text}`} aria-hidden="true" />
               </div>
             </div>
             <p className="text-3xl font-bold text-white">{value.toLocaleString()}</p>

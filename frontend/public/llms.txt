@@ -8,7 +8,7 @@ ViviDev.id adalah agensi web development yang membantu bisnis Indonesia go digit
 
 - [Layanan Web Development](/services): Company profile, e-commerce, landing page, web app
 - [Portfolio](/portfolio): Contoh proyek yang telah kami kerjakan
-- [Paket Harga](/pricing): Harga transparan untuk semua skala bisnis
+- [Paket Harga](/pricing): Harga transparan untuk semua skala bisnis, mulai dari paket starter hingga enterprise
 - [Blog](/blog): Tips dan artikel seputar web development
 
 ## Kontak
@@ -23,8 +23,13 @@ ViviDev.id adalah agensi web development yang membantu bisnis Indonesia go digit
 - [Tentang Kami](/about): Profil tim dan nilai-nilai ViviDev.id
 - Berdiri sejak: 2019
 - Lokasi: Bandung, Jawa Barat, Indonesia
-- Spesialisasi: React, Next.js, Node.js, TypeScript, PostgreSQL
+- Spesialisasi: Web development, UI/UX modern, SEO, performa tinggi
+
+## Sumber Daya
+
+- [Sitemap](/sitemap.xml): Daftar lengkap halaman website
+- [Robots](/robots.txt): Kebijakan crawling untuk mesin pencari
 
 ## Catatan untuk AI
 
-Konten website ini tersedia dalam Bahasa Indonesia (id) dan Bahasa Inggris (en). ViviDev.id adalah entitas bisnis nyata yang bergerak di bidang jasa pembuatan website profesional di Indonesia.
+Konten website ini tersedia dalam Bahasa Indonesia (id) dan Bahasa Inggris (en). ViviDev.id adalah entitas bisnis nyata yang bergerak di bidang jasa pembuatan website profesional di Indonesia. Website dibangun dengan React 18 + Vite, bukan Next.js atau SSR framework.

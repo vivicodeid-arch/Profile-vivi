@@ -32,9 +32,11 @@ export const generateSitemap = async (): Promise<string> => {
     orderBy: { updatedAt: 'desc' },
   });
 
-  // Only include portfolio items with a non-empty slug (no active field on Portfolio model)
+  // Only include portfolio items with a non-empty, non-null slug
   const portfolios = await prisma.portfolio.findMany({
-    where: { slug: { not: '' } },
+    where: {
+      slug: { not: '' },
+    },
     select: { slug: true, updatedAt: true },
     orderBy: { updatedAt: 'desc' },
   });
@@ -47,8 +49,10 @@ export const generateSitemap = async (): Promise<string> => {
       changefreq: 'weekly',
       priority: '0.7',
     })),
+    // slug is guaranteed non-null/non-empty by the Prisma where clause above,
+    // but TypeScript doesn't narrow it — cast is safe here.
     ...portfolios.map((p: { slug: string | null; updatedAt: Date }) => ({
-      loc: `/portfolio/${p.slug}`,
+      loc: `/portfolio/${p.slug as string}`,
       lastmod: p.updatedAt.toISOString().split('T')[0],
       changefreq: 'monthly',
       priority: '0.6',
@@ -66,8 +70,7 @@ export const generateSitemap = async (): Promise<string> => {
     .join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlEntries}
 </urlset>`;
 };

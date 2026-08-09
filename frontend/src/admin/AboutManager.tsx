@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Globe } from 'lucide-react';
 import api from '../services/api';
+import { Toast, useToast } from '../components/ui/Toast';
 
 interface AboutContent {
   hero: { title: string; subtitle: string };
@@ -69,6 +70,8 @@ export default function AboutManager() {
     }));
   };
 
+  const { toast, showToast, hideToast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -77,9 +80,10 @@ export default function AboutManager() {
         api.put('/about-content', { lang: 'id', content: formData.id }),
         api.put('/about-content', { lang: 'en', content: formData.en }),
       ]);
-      alert('About page content saved successfully.');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to save content.');
+      showToast('About page content saved successfully.', 'success');
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to save content.';
+      showToast(message, 'error');
     } finally {
       setIsSaving(false);
     }
@@ -260,6 +264,8 @@ export default function AboutManager() {
           </button>
         </div>
       </form>
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
     </div>
   );
 }

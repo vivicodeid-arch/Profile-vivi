@@ -1,12 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 import { validate } from '../middleware/validate';
 import { authenticate } from '../middleware/auth.middleware';
 import { AppError } from '../middleware/errorHandler';
+import { env } from '../config/env';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Accepts absolute URLs (https://...) or relative paths (/uploads/...) or empty string
 const urlOrPath = z.string().refine(
@@ -25,13 +26,28 @@ const postSchema = z.object({
   published: z.boolean().default(false),
 });
 
-// GET /api/blog - Public list (admin can fetch all including drafts)
+// GET /api/blog - Public list; ?all=true requires authentication to include drafts
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const all = req.query.all === 'true';
+
+    // Only authenticated requests may fetch drafts
+    const requestsAll = req.query.all === 'true';
+    let isAdmin = false;
+    if (requestsAll) {
+      try {
+        const token = req.cookies?.access_token;
+        if (token) {
+          jwt.verify(token, env.JWT_SECRET);
+          isAdmin = true;
+        }
+      } catch {
+        // Invalid / missing token — treat as public request
+      }
+    }
+    const all = requestsAll && isAdmin;
 
     const [posts, total] = await Promise.all([
       prisma.post.findMany({

@@ -18,12 +18,14 @@ export default function PartnersSection() {
   // Keep a stable section in the DOM while loading or when there are no
   // partners. Returning null would yank the element out and shift all content
   // below it — a CLS contributor. The placeholder reserves the same height
+  // as the live section (py-12 + heading ~28px + marquee ~40px ≈ 164px)
   // so layout remains anchored in all states.
   if (isLoading || !partners || partners.length === 0) {
     return (
       <section
-        className="py-12 bg-white dark:bg-gray-950 border-y border-gray-100 dark:border-gray-800 overflow-hidden min-h-[160px]"
+        className="py-12 bg-white dark:bg-gray-950 border-y border-gray-100 dark:border-gray-800 overflow-hidden"
         aria-hidden="true"
+        style={{ minHeight: '164px' }}
       />
     );
   }
@@ -53,12 +55,14 @@ export default function PartnersSection() {
 
 function PartnerLogo({ partner }: { partner: Partner }) {
   const content = (
-    <div className="flex items-center justify-center h-10 w-36 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300 shrink-0">
+    <div className="flex items-center justify-center h-10 w-36 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-[filter,opacity] duration-300 shrink-0">
       <img
         src={getOptUrl(partner.logoUrl, 320)}
         alt={partner.name}
         className="max-h-full max-w-full object-contain"
         loading="lazy"
+        width={130}
+        height={40}
       />
     </div>
   );

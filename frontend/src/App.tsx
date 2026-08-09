@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation, Link } from 'react-router-dom';
-import { useSettingsStore } from './store/settingsStore';
 import { useThemeStore } from './store/themeStore';
 import PageTransition from './components/PageTransition';
 import Spinner from './components/ui/Spinner';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Public layout
 import Header from './components/layout/Header';
@@ -46,23 +46,30 @@ function PageLoader() {
   return <Spinner className="min-h-[60vh]" />;
 }
 
-function PublicLayout({ children }: { children: React.ReactNode }) {
+// PublicShell renders Header/Footer/WhatsApp as stable DOM nodes that are
+// never unmounted — even while Suspense shows a fallback for lazy pages.
+// This keeps the footer in the layout at all times, preventing CLS.
+// It hides itself on /admin/* routes via CSS visibility so it doesn't
+// interfere with the admin layout while remaining in the DOM.
+function PublicShell({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header, Footer, WhatsAppButton are outside Suspense so they are never
-          unmounted while lazy page chunks are loading. The outer Suspense in
-          App wraps only isAdmin routes; the inner Suspense here covers public
-          lazy pages only — keeping Footer stable in the DOM at all times.
-          Unmounting Footer during Suspense fallback was the root cause of
-          CLS 0.40: footer rect went to {0,0,0,0} then reappeared shifted. */}
-      <Header />
+      {/* Hidden on admin, but stays in DOM to avoid layout shift */}
+      {!isAdmin && <Header />}
       <main className="flex-grow">
-        <Suspense fallback={<PageLoader />}>
-          {children}
-        </Suspense>
+        {children}
       </main>
-      <Footer />
-      <WhatsAppButton />
+      {/* Footer reserved space is always in the DOM on public routes.
+          min-h-[300px] matches the footer placeholder in index.html. */}
+      {!isAdmin && (
+        <>
+          <Footer />
+          <WhatsAppButton />
+        </>
+      )}
     </div>
   );
 }
@@ -85,16 +92,12 @@ function NotFound() {
 // App
 // ---------------------------------------------------------------------------
 
-export default function App() {
+// AdminThemeSync — komponen terpisah agar tidak merusak logika routing
+function AdminThemeSync() {
   const location = useLocation();
-  const isAdmin  = location.pathname.startsWith('/admin');
+  const { theme } = useThemeStore();
+  const isAdmin = location.pathname.startsWith('/admin');
 
-  const { fetchSettings } = useSettingsStore();
-  const { theme }         = useThemeStore();
-
-  // Sync dark-mode class on <html>
-  // Admin pages: always dark (all admin components styled for dark mode)
-  // Public pages: follow user theme preference
   useEffect(() => {
     if (isAdmin) {
       document.documentElement.classList.add('dark');
@@ -103,46 +106,56 @@ export default function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme, isAdmin]);
 
-  // Fetch CMS settings once on mount
-  useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
+  return null;
+}
+
+export default function App() {
+  const location = useLocation();
+
+  // NOTE: fetchSettings() tidak lagi dipanggil di sini.
+  // settingsStore.ts sudah melakukan auto-fetch saat store dibuat (di luar
+  // komponen), sehingga fetch dimulai lebih awal — sebelum React render tree.
+  // Double call via useEffect + auto-fetch menyebabkan 2 request berurutan
+  // dan membuang bandwidth pada first visit.
 
   return (
     <Suspense fallback={<PageLoader />}>
-      {isAdmin ? (
+      <AdminThemeSync />
+      <PublicShell>
         <Routes>
+          {/* ----------------------------------------------------------------
+              Admin routes — PublicShell menyembunyikan Header/Footer di /admin
+          ---------------------------------------------------------------- */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index                element={<Dashboard />} />
-            <Route path="blog"          element={<BlogEditor />} />
-            <Route path="portfolio"     element={<PortfolioManager />} />
-            <Route path="services"      element={<ServiceManager />} />
-            <Route path="team"          element={<TeamManager />} />
-            <Route path="media"         element={<MediaManager />} />
-            <Route path="settings"      element={<SettingsManager />} />
-            <Route path="about"         element={<AboutManager />} />
-            <Route path="partners"      element={<PartnerManager />} />
-            <Route path="pricing"       element={<PricingManager />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index                element={<Dashboard />} />
+              <Route path="blog"          element={<BlogEditor />} />
+              <Route path="portfolio"     element={<PortfolioManager />} />
+              <Route path="services"      element={<ServiceManager />} />
+              <Route path="team"          element={<TeamManager />} />
+              <Route path="media"         element={<MediaManager />} />
+              <Route path="settings"      element={<SettingsManager />} />
+              <Route path="about"         element={<AboutManager />} />
+              <Route path="partners"      element={<PartnerManager />} />
+              <Route path="pricing"       element={<PricingManager />} />
+            </Route>
           </Route>
+
+          {/* ----------------------------------------------------------------
+              Public routes — Header/Footer sudah ada di PublicShell di atas
+          ---------------------------------------------------------------- */}
+          <Route path="/"            element={<PageTransition locationKey={location.key}><Home /></PageTransition>} />
+          <Route path="/about"       element={<PageTransition locationKey={location.key}><About /></PageTransition>} />
+          <Route path="/services"    element={<PageTransition locationKey={location.key}><Services /></PageTransition>} />
+          <Route path="/portfolio"   element={<PageTransition locationKey={location.key}><Portfolio /></PageTransition>} />
+          <Route path="/blog"        element={<PageTransition locationKey={location.key}><Blog /></PageTransition>} />
+          <Route path="/blog/:slug"  element={<PageTransition locationKey={location.key}><BlogPost /></PageTransition>} />
+          <Route path="/contact"     element={<PageTransition locationKey={location.key}><Contact /></PageTransition>} />
+          <Route path="/pricing"     element={<PageTransition locationKey={location.key}><Pricing /></PageTransition>} />
+          <Route path="*"            element={<NotFound />} />
         </Routes>
-      ) : (
-        <PublicLayout>
-          <PageTransition locationKey={location.key}>
-            <Routes>
-              <Route path="/"            element={<Home />} />
-              <Route path="/about"       element={<About />} />
-              <Route path="/services"    element={<Services />} />
-              <Route path="/portfolio"   element={<Portfolio />} />
-              <Route path="/blog"        element={<Blog />} />
-              <Route path="/blog/:slug"  element={<BlogPost />} />
-              <Route path="/contact"     element={<Contact />} />
-              <Route path="/pricing"     element={<Pricing />} />
-              <Route path="*"            element={<NotFound />} />
-            </Routes>
-          </PageTransition>
-        </PublicLayout>
-      )}
+      </PublicShell>
     </Suspense>
   );
 }

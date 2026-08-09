@@ -54,10 +54,9 @@ export default function WorkProcessSection({ steps = defaultSteps }: WorkProcess
     >
       <div className="container-custom">
         <div 
-          className="text-center transition-all duration-700 mb-20"
+          className="text-center transition-opacity duration-700 mb-20"
           style={{
             opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(30px)'
           }}
         >
           <span className="text-primary-600 font-bold tracking-widest text-sm uppercase mb-4 block">
@@ -83,7 +82,7 @@ export default function WorkProcessSection({ steps = defaultSteps }: WorkProcess
                 <div key={step.id} className="relative flex lg:flex-col items-start lg:items-center">
                   
                   {/* Circle Number */}
-                  <div className="w-16 h-16 shrink-0 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] border-4 border-slate-50 dark:border-slate-900 z-10 transition-transform duration-300 hover:scale-110">
+                  <div className="w-16 h-16 shrink-0 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] border-4 border-slate-50 dark:border-slate-900 z-10 transition-transform duration-300 hover:[@media(hover:hover)]:scale-110">
                     {String(step.id).padStart(2, '0')}
                   </div>
 

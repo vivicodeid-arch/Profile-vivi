@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { Upload, Trash2, Copy, Check, Image } from 'lucide-react';
 import api from '../services/api';
+import ErrorAlert from '../components/ui/ErrorAlert';
+import { Toast, useToast } from '../components/ui/Toast';
 
 interface Media {
   id: string;
@@ -16,10 +18,14 @@ export default function MediaManager() {
   const [items, setItems] = useState<Media[]>([]);
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const { toast, showToast, hideToast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fetch = () => api.get('/media').then(r => setItems(r.data.data || [])).catch(() => {});
-  useEffect(() => { fetch(); }, []);
+
+  const fetchMedia = () => api.get('/media').then(r => setItems(r.data.data || [])).catch(() => {});
+  useEffect(() => { fetchMedia(); }, []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,17 +33,31 @@ export default function MediaManager() {
     const formData = new FormData();
     formData.append('file', file);
     setUploading(true);
+    setUploadError(null);
     try {
       await api.post('/media', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      fetch();
-    } catch { alert('Upload gagal. Pastikan file adalah gambar dan ukuran < 5MB.'); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ''; }
+      fetchMedia();
+    } catch {
+      setUploadError('Upload gagal. Pastikan file adalah gambar dan ukuran < 5MB.');
+    } finally { setUploading(false); if (fileRef.current) fileRef.current.value = ''; }
   };
 
+
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus media ini?')) return;
-    await api.delete(`/media/${id}`);
-    fetch();
+    setConfirmDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    try {
+      await api.delete(`/media/${confirmDeleteId}`);
+      fetchMedia();
+      showToast('Media berhasil dihapus.', 'success');
+    } catch {
+      showToast('Gagal menghapus media.', 'error');
+    } finally {
+      setConfirmDeleteId(null);
+    }
   };
 
   const copyUrl = (url: string) => {
@@ -119,6 +139,25 @@ export default function MediaManager() {
           ))}
         </div>
       )}
+
+      {/* Upload error */}
+      {uploadError && <ErrorAlert message={uploadError} className="mt-2" />}
+
+      {/* Confirm delete dialog */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-white font-semibold mb-2">Hapus Media?</h3>
+            <p className="text-gray-400 text-sm mb-6">File akan dihapus permanen dan tidak bisa dipulihkan.</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setConfirmDeleteId(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Batal</button>
+              <button onClick={confirmDelete} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
     </div>
   );
 }

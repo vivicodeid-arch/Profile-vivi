@@ -21,14 +21,12 @@ const navItems = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout, checkAuth } = useAuthStore();
+  const { user, logout, checkAuth } = useAuthStore();
   const { adminTheme, toggleAdminTheme } = useThemeStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    checkAuth().then(() => {
-      if (!isAuthenticated) navigate('/admin/login', { replace: true });
-    });
+    checkAuth().catch(() => navigate('/admin/login', { replace: true }));
   }, []);
 
   const handleLogout = async () => {

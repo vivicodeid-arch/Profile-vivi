@@ -37,7 +37,7 @@ export default function ServiceManager() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await api.post('/media/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await api.post('/media', form, { headers: { 'Content-Type': 'multipart/form-data' } });
       const url = res.data.data?.url || res.data.url || '';
       setEditing(p => p ? { ...p, imageUrl: url } : p);
     } catch {

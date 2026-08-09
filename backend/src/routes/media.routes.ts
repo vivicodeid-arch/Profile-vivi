@@ -3,15 +3,14 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaClient } from '@prisma/client';
 import { optimize } from 'svgo';
 import { authenticate } from '../middleware/auth.middleware';
 import { uploadLimiter } from '../middleware/rateLimit';
 import { AppError } from '../middleware/errorHandler';
 import { env } from '../config/env';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
 const MAX_SIZE = env.MAX_FILE_SIZE_MB * 1024 * 1024;

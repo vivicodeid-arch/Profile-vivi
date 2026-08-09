@@ -1,12 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { validate } from '../middleware/validate';
 import { authenticate } from '../middleware/auth.middleware';
 import { AppError } from '../middleware/errorHandler';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const featureSchema = z.object({
   text: z.object({ id: z.string().min(1), en: z.string().min(1) }),

@@ -1,10 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { PrismaClient } from "@prisma/client";
 import { authenticate } from "../middleware/auth.middleware";
 import { z } from "zod";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const positionEnum = z.enum(["top", "center", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"]);
 

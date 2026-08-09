@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { Plus, Trash2, Save, GripVertical, Eye, EyeOff, Upload, X } from 'lucide-react';
+import { Toast, useToast } from '../components/ui/Toast';
 
 interface Partner {
   id: string;
@@ -18,7 +19,8 @@ export default function PartnerManager() {
   const [showAdd, setShowAdd] = useState(false);
   const [newPartner, setNewPartner] = useState({ name: '', logoUrl: '', websiteUrl: '' });
   const [uploading, setUploading] = useState(false);
-  
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const { toast, showToast, hideToast } = useToast();
   const newFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,15 +46,19 @@ export default function PartnerManager() {
       data.append('alt', file.name);
       const res = await api.post('/media', data, { headers: { 'Content-Type': 'multipart/form-data' } });
       if (res.data.status === 'ok') onSuccess(res.data.data.url);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Upload failed');
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Upload failed';
+      showToast(message, 'error');
     } finally {
       setUploading(false);
     }
   };
 
   const handleAdd = async () => {
-    if (!newPartner.name || !newPartner.logoUrl) return alert('Nama dan logo wajib diisi');
+    if (!newPartner.name || !newPartner.logoUrl) {
+      showToast('Nama dan logo wajib diisi', 'error');
+      return;
+    }
     try {
       const res = await api.post('/partners', {
         ...newPartner,
@@ -62,8 +68,10 @@ export default function PartnerManager() {
       setPartners(prev => [...prev, res.data.data]);
       setNewPartner({ name: '', logoUrl: '', websiteUrl: '' });
       setShowAdd(false);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to add partner');
+      showToast('Partner berhasil ditambahkan.', 'success');
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to add partner';
+      showToast(message, 'error');
     }
   };
 
@@ -72,20 +80,27 @@ export default function PartnerManager() {
     try {
       const res = await api.put(`/partners/${partner.id}`, { active: !partner.active });
       setPartners(prev => prev.map(p => p.id === partner.id ? res.data.data : p));
-    } catch (err: any) {
-      alert('Failed to update');
+    } catch {
+      showToast('Gagal mengubah status partner.', 'error');
     } finally {
       setSaving(null);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus partner ini?')) return;
+    setConfirmDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!confirmDeleteId) return;
     try {
-      await api.delete(`/partners/${id}`);
-      setPartners(prev => prev.filter(p => p.id !== id));
-    } catch (err: any) {
-      alert('Failed to delete');
+      await api.delete(`/partners/${confirmDeleteId}`);
+      setPartners(prev => prev.filter(p => p.id !== confirmDeleteId));
+      showToast('Partner berhasil dihapus.', 'success');
+    } catch {
+      showToast('Gagal menghapus partner.', 'error');
+    } finally {
+      setConfirmDeleteId(null);
     }
   };
 
@@ -107,6 +122,7 @@ export default function PartnerManager() {
   );
 
   return (
+    <>
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -248,5 +264,22 @@ export default function PartnerManager() {
         )}
       </div>
     </div>
+
+      {/* Confirm delete dialog */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-white font-semibold mb-2">Hapus Partner?</h3>
+            <p className="text-gray-400 text-sm mb-6">Tindakan ini tidak bisa dibatalkan.</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setConfirmDeleteId(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Batal</button>
+              <button onClick={confirmDelete} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
+    </>
   );
 }

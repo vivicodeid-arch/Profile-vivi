@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Code2, Zap, Globe } from 'lucide-react';
@@ -7,9 +6,10 @@ import { useTilt } from '../../hooks/useTilt';
 import { responsiveSrc } from '../../lib/images';
 
 // ---------------------------------------------------------------------------
-// Particles — floating dots dalam palet biru
+// Particles — fewer on mobile to reduce compositor workload
 // ---------------------------------------------------------------------------
-const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
+const PARTICLE_COUNT = window.matchMedia('(max-width: 640px)').matches ? 8 : 24;
+const PARTICLES = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
   id: i,
   size: Math.random() * 4 + 1.5,
   left: Math.random() * 100,
@@ -70,23 +70,15 @@ export default function HeroSection() {
   const { t, i18n } = useTranslation(['common', 'pages']);
   const lang = i18n.language as 'id' | 'en';
   const { settings } = useSettingsStore();
-  // Start visible immediately — the 300 ms delay was deferring the first paint
-  // and causing NO_FCP on slow connections. Entrance animations still run via
-  // CSS transition once the element is in the DOM.
-  const [visible, setVisible] = useState(false);
   const heroTilt = useTilt<HTMLDivElement>({ maxRotate: 15, scale: 1.04, perspective: 800 });
 
-  useEffect(() => {
-    // Use rAF so the browser paints the initial frame first, then kicks off
-    // the fade-in transition — no arbitrary 300 ms network-dependent delay.
-    const raf = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
+  // fadeIn: opacity-only, tidak ada translateY (CLS fix).
+  // Delay tetap berguna untuk staggered entrance teks hero.
+  // visible selalu true — elemen langsung terlihat saat JS parse selesai,
+  // tanpa rAF delay yang bisa menyebabkan browser skip LCP candidate.
   const fadeIn = (delay: string): React.CSSProperties => ({
-    opacity:         visible ? 1 : 0,
-    transform:       visible ? 'translateY(0)' : 'translateY(36px)',
-    transition:      'opacity 1000ms, transform 1000ms',
+    opacity:         1,
+    transition:      'opacity 800ms',
     transitionDelay: delay,
   });
 
@@ -257,14 +249,13 @@ export default function HeroSection() {
           </div>
 
           {/* ── Right: mockup image ─────────────────────────────────────────── */}
+          {/* NOTE: Wrapper ini sengaja TIDAK diberi opacity/transform animasi.
+              LCP element (img di bawah) harus visible sejak frame pertama agar
+              browser bisa menghitungnya sebagai LCP candidate. Animasi pada
+              wrapper yang dimulai dari opacity:0 akan menunda LCP hingga
+              transisi selesai (~1200ms) — dihapus untuk memperbaiki LCP score. */}
           <div
             className="relative w-full flex justify-center lg:justify-end mt-10 lg:mt-0"
-            style={{
-              opacity:         visible ? 1 : 0,
-              transform:       visible ? 'translateX(0)' : 'translateX(40px)',
-              transition:      'opacity 1000ms, transform 1000ms',
-              transitionDelay: '200ms',
-            }}
           >
             {/* Glow di belakang gambar */}
             <div
@@ -285,19 +276,25 @@ export default function HeroSection() {
               aria-hidden="true"
             />
 
+            {/* NOTE: willChange dan transformStyle dihapus dari wrapper ini.
+                Pada LCP element, kedua property ini memaksa browser membuat GPU layer
+                baru yang menambah overhead composite step dan bisa menunda LCP paint.
+                Efek tilt tetap berjalan via onMouseMove — transformStyle di-set
+                oleh useTilt saat interaksi, jauh setelah LCP sudah terhitung. */}
             <div
               ref={heroTilt.ref}
               onMouseMove={heroTilt.onMouseMove}
               onMouseLeave={heroTilt.onMouseLeave}
-              style={{ transformStyle: 'preserve-3d', willChange: 'transform', display: 'inline-block' }}
+              style={{ display: 'inline-block' }}
             >
               <img
+                ref={el => { el?.setAttribute('fetchpriority', 'high'); }}
                 src={heroImg.src}
                 srcSet={heroImg.srcSet}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
                 alt="Website Mockup"
                 className="relative z-10 w-full max-w-[560px] aspect-[5/4] object-contain drop-shadow-2xl"
                 loading="eager"
-                fetchPriority="high"
                 width={560}
                 height={448}
               />
@@ -309,7 +306,7 @@ export default function HeroSection() {
       {/* Scroll indicator */}
       <div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
-        style={{ opacity: visible ? 0.6 : 0, transition: 'opacity 700ms', transitionDelay: '900ms' }}
+        style={{ opacity: 0.6, transition: 'opacity 700ms', transitionDelay: '900ms' }}
         aria-hidden="true"
       >
         <span className="text-xs tracking-widest uppercase" style={{ color: '#90CAF9' }}>Scroll</span>

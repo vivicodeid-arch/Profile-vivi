@@ -3,6 +3,61 @@ import api from '../services/api';
 import type { HeroPosition, HeroType } from '../lib/constants';
 
 // ---------------------------------------------------------------------------
+// localStorage cache — stale-while-revalidate
+//
+// Problem: heroImageUrl (dan semua settings lain) hanya tersedia setelah API
+// call selesai. Ini berarti hero image tidak bisa mulai didownload sampai:
+//   HTML → JS → React render → fetch /api/settings → dapat URL → fetch image
+// Dua round-trip berurutan ini menambah 300-600ms ke LCP di koneksi lambat.
+//
+// Fix: simpan settings di localStorage setelah fetch pertama. Di visit
+// berikutnya, settings tersedia SYNCHRONOUSLY saat store diinisialisasi —
+// hero image URL langsung ada di render pertama, browser bisa preload gambar
+// tanpa menunggu API. API tetap dipanggil di background untuk update stale data.
+// ---------------------------------------------------------------------------
+
+const CACHE_KEY    = 'vividev_settings_cache';
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 jam — revalidate di background setelahnya
+
+interface CacheEntry {
+  data:      Record<string, string>;
+  savedAt:   number;
+}
+
+function loadCachedSettings(): Record<string, string> | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const entry: CacheEntry = JSON.parse(raw);
+    // Kembalikan cache meski sudah expired — data lama tetap lebih baik dari
+    // default kosong. API call di fetchSettings() akan update di background.
+    return entry.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedSettings(data: Record<string, string>): void {
+  try {
+    const entry: CacheEntry = { data, savedAt: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
+  } catch {
+    // localStorage bisa penuh (QuotaExceededError) — abaikan saja
+  }
+}
+
+function isCacheStale(): boolean {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return true;
+    const entry: CacheEntry = JSON.parse(raw);
+    return Date.now() - entry.savedAt > CACHE_TTL_MS;
+  } catch {
+    return true;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Typed settings interface — replaces the loose Record<string, string>
 // ---------------------------------------------------------------------------
 
@@ -124,25 +179,54 @@ const DEFAULT_SETTINGS: SiteSettings = {
   aboutHomeCtaUrl: '', aboutHomeCtaText: '',
 };
 
+// Inisialisasi store dengan cached settings jika tersedia.
+// Ini membuat heroImageUrl, logoUrl, dll. tersedia SYNCHRONOUSLY pada render
+// pertama — browser bisa langsung mulai download hero image tanpa menunggu
+// API call, memotong 1 round-trip dari critical path LCP.
+const cached = loadCachedSettings();
+const INITIAL_SETTINGS: SiteSettings = cached
+  ? { ...DEFAULT_SETTINGS, ...cached }
+  : DEFAULT_SETTINGS;
+
+// isFetching flag mencegah race condition jika fetchSettings() dipanggil
+// bersamaan (misal: auto-fetch di store init + panggilan manual lainnya).
+// Tanpa ini, dua request bisa berjalan paralel dan yang selesai terakhir
+// akan overwrite state dengan data yang mungkin lebih lama.
+let isFetching = false;
+
 export const useSettingsStore = create<SettingsState>((set) => ({
-  settings: DEFAULT_SETTINGS,
-  // Start as false — DEFAULT_SETTINGS provides safe fallbacks for every key,
-  // so components can render immediately and update in-place when the API
-  // responds. This eliminates the skeleton → content height shift (CLS).
+  settings: INITIAL_SETTINGS,
+  // isLoading: false — komponen merender langsung dari cached/default settings.
+  // Tidak ada skeleton → layout shift (CLS).
   isLoading: false,
 
   fetchSettings: async () => {
-    set({ isLoading: true });
+    // Jika cache masih fresh, skip fetch dan render dari cache saja.
+    if (!isCacheStale()) return;
+    // Cegah double-fetch jika dipanggil bersamaan
+    if (isFetching) return;
+    isFetching = true;
+
+    // Tidak set isLoading:true — update terjadi di background tanpa
+    // menyebabkan skeleton/spinner yang bisa menggeser layout (CLS).
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
     try {
-      const res = await api.get('/settings');
+      const res = await api.get('/settings', { signal: controller.signal });
       if (res.data.status === 'ok') {
-        // Merge with defaults so new keys always have a safe value
-        set({ settings: { ...DEFAULT_SETTINGS, ...res.data.data } });
+        const merged = { ...DEFAULT_SETTINGS, ...res.data.data };
+        set({ settings: merged });
+        // Simpan ke localStorage untuk kunjungan berikutnya
+        saveCachedSettings(res.data.data);
       }
-    } catch (err) {
-      console.error('Failed to fetch settings:', err);
+    } catch (err: unknown) {
+      // Abaikan AbortError (timeout) — tidak perlu log, pakai cache saja
+      if (err instanceof Error && err.name !== 'AbortError' && err.name !== 'CanceledError') {
+        console.error('Failed to fetch settings:', err);
+      }
     } finally {
-      set({ isLoading: false });
+      clearTimeout(timeoutId);
+      isFetching = false;
     }
   },
 
@@ -151,7 +235,10 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     try {
       const res = await api.put('/settings', data);
       if (res.data.status === 'ok') {
-        set({ settings: { ...DEFAULT_SETTINGS, ...res.data.data } });
+        const merged = { ...DEFAULT_SETTINGS, ...res.data.data };
+        set({ settings: merged });
+        // Invalidate cache agar visit berikutnya dapat data terbaru
+        saveCachedSettings(res.data.data);
       }
     } catch (err) {
       console.error('Failed to update settings:', err);
@@ -161,3 +248,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     }
   },
 }));
+
+// Auto-fetch settings saat store pertama kali dibuat — bukan nunggu useEffect
+// di komponen. Ini mengurangi waktu antara React render pertama dan settings
+// update, mempercepat heroImageUrl tersedia jika cache expired.
+// Fetch berjalan di background, tidak blocking render sama sekali.
+if (isCacheStale()) {
+  useSettingsStore.getState().fetchSettings();
+}

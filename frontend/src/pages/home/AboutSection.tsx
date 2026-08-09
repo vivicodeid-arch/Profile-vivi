@@ -40,32 +40,38 @@ export default function AboutSection() {
       <div className="container-custom">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Image — slide dari kiri */}
+          {/* Image — fade in */}
           <div
-            className="relative order-2 lg:order-1 transition-all duration-700"
+            className="relative order-2 lg:order-1 transition-opacity duration-700"
             style={{
-              opacity:   inView ? 1 : 0,
-              transform: inView ? 'translateX(0)' : 'translateX(-30px)',
+              opacity: inView ? 1 : 0,
             }}
           >
             <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl -translate-x-1/4 -translate-y-1/4" />
-            <img
-              src={aboutImg.src}
-              srcSet={aboutImg.srcSet}
-              alt="ViviDev Web Design Mockup"
-              className="relative w-full aspect-[11/6] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
-              loading="eager"
-              width={1100}
-              height={600}
-            />
+            {/* Wrapper dengan aspect-ratio eksplisit mencegah CLS saat src berganti
+                dari fallback (/hero-mockup.png) ke gambar CMS setelah settings API
+                selesai. Tanpa ini, browser harus reflow ulang karena dimensi gambar
+                berubah. aspect-[11/6] + width/height attr memastikan ruang sudah
+                direservasi sebelum gambar manapun didownload. */}
+            <div className="relative w-full" style={{ aspectRatio: '11 / 6' }}>
+              <img
+                src={aboutImg.src}
+                srcSet={aboutImg.srcSet}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                alt="ViviDev Web Design Mockup"
+                className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
+                loading="eager"
+                width={1100}
+                height={600}
+              />
+            </div>
           </div>
 
-          {/* Content — slide dari kanan */}
+          {/* Content — fade in */}
           <div
-            className="order-1 lg:order-2 transition-all duration-700 delay-150"
+            className="order-1 lg:order-2 transition-opacity duration-700 delay-150"
             style={{
-              opacity:   inView ? 1 : 0,
-              transform: inView ? 'translateX(0)' : 'translateX(30px)',
+              opacity: inView ? 1 : 0,
             }}
           >
             <h2 className="text-primary-600 font-semibold text-lg mb-2">

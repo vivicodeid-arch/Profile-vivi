@@ -1,10 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware/auth.middleware';
 import { z } from 'zod';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const partnerSchema = z.object({
   name: z.string().min(1),

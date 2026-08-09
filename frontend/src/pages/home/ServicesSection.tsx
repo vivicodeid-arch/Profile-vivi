@@ -46,6 +46,9 @@ function ServiceNode({
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
+    // Set transformStyle dan willChange hanya saat interaksi — tidak di mount
+    el.style.transformStyle = 'preserve-3d';
+    el.style.willChange     = 'transform';
     const rect = el.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
     const y = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
@@ -61,6 +64,13 @@ function ServiceNode({
     el.style.transition = 'transform 0.45s ease-out, box-shadow 0.45s ease-out';
     el.style.transform  = 'perspective(400px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
     el.style.boxShadow  = '';
+    // Reset willChange setelah animasi selesai
+    setTimeout(() => {
+      if (ref.current) {
+        ref.current.style.willChange     = 'auto';
+        ref.current.style.transformStyle = '';
+      }
+    }, 500);
   }, []);
 
   const Icon = SERVICE_ICON_MAP[service.icon] ?? SERVICE_ICON_MAP.code;
@@ -69,22 +79,23 @@ function ServiceNode({
     <div
       className="absolute"
       style={{
-        left: `${position.x}%`,
-        top:  `${position.y}%`,
-        transform:  inView
-          ? 'translate(-50%, -50%)'
-          : 'translate(-50%, calc(-50% + 20px))',
+        left:       `${position.x}%`,
+        top:        `${position.y}%`,
+        // CLS fix: translate(-50%,-50%) tetap konstan, tidak berubah saat inView.
+        // Hanya opacity yang dianimasikan — transform position tidak boleh berubah
+        // karena node ini pakai position:absolute dan shift-nya akan diukur CLS.
+        transform:  'translate(-50%, -50%)',
         opacity:    inView ? 1 : 0,
-        transition: `opacity 600ms ease ${index * 150 + 200}ms, transform 600ms ease ${index * 150 + 200}ms`,
+        transition: `opacity 600ms ease ${index * 150 + 200}ms`,
         zIndex: 10,
       }}
     >
-      {/* Inner div: handles 3D tilt only */}
+      {/* Inner div: handles 3D tilt only — willChange diset di onMouseMove */}
       <div
         ref={ref}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         <div
           className="w-28 rounded-2xl border border-blue-200 bg-white/90 backdrop-blur-sm p-3 flex flex-col items-center gap-2 cursor-default select-none"
@@ -192,9 +203,9 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
               </div>
               <div className="h-10 w-36 bg-blue-400/40 rounded-xl mt-4" />
             </div>
-            {/* Image column skeleton */}
+            {/* Image column skeleton — aspect-[5/4] matches live image (width=800, height=640) */}
             <div className="order-1 lg:order-2">
-              <div className="w-full aspect-[4/3] bg-blue-200/40 rounded-2xl" />
+              <div className="w-full aspect-[5/4] bg-blue-200/40 rounded-2xl" />
             </div>
           </div>
         </div>
@@ -214,10 +225,9 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
 
           {/* Text column */}
           <div
-            className="order-2 lg:order-1 transition-all duration-700"
+            className="order-2 lg:order-1 transition-opacity duration-700"
             style={{
-              opacity:   inView ? 1 : 0,
-              transform: inView ? 'translateY(0)' : 'translateY(20px)',
+              opacity: inView ? 1 : 0,
             }}
           >
             <h2 className="text-primary-600 font-semibold text-lg mb-2">
@@ -273,10 +283,9 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
 
           {/* Image column */}
           <div
-            className="relative order-1 lg:order-2 transition-all duration-1000"
+            className="relative order-1 lg:order-2 transition-opacity duration-1000"
             style={{
-              opacity:   inView ? 1 : 0,
-              transform: inView ? 'translateX(0)' : 'translateX(40px)',
+              opacity: inView ? 1 : 0,
             }}
           >
             <div className="absolute inset-0 rounded-full blur-3xl translate-x-1/4 -translate-y-1/4" style={{ backgroundColor: 'rgba(33,150,243,0.12)' }} />
@@ -284,7 +293,7 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
               ref={imgTilt.ref}
               onMouseMove={imgTilt.onMouseMove}
               onMouseLeave={imgTilt.onMouseLeave}
-              style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+              style={{ transformStyle: 'preserve-3d' }}
             >
               <img
                 {...responsiveSrc(settings.servicesSectionHomeImage || '/hero-mockup.png')}

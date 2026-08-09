@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <meta name="theme-color" content="#2563eb" />
 
     <!-- Default SEO (overridden per-page by react-helmet-async) -->
@@ -30,20 +30,40 @@
 
     <!-- Hero image is served from the CMS (settings.heroImageUrl) at runtime,
          so it can't be preloaded statically. The <img> in HeroSection uses
-         fetchPriority="high" + srcset instead. Keep the fallback asset tiny. -->
+         fetchPriority="high" + srcset instead. Keep the fallback asset tiny.
 
-    <!-- Plus Jakarta Sans font
-         - display=optional: browser uses cached font immediately, falls back to
-           system font on first visit with no swap/shift at all. This eliminates
-           FILS (Font-Induced Layout Shift) which was causing CLS to spike.
-         - On repeat visits the font is cached → zero layout shift, zero FOIT.
-         - preconnect still helps warm the connection for the first visit.    -->
+         LCP fix: preload the static fallback hero so on first visit (before
+         localStorage cache is populated) the browser starts downloading the
+         image immediately from the HTML parser — not after JS executes.
+         On subsequent visits the cached heroImageUrl takes over via srcset. -->
+    <link rel="preload" as="image" href="/hero-mockup.png" fetchpriority="high" />
+
+    <!-- dns-prefetch + preconnect untuk API server (same-origin di production,
+         tapi di VPS bisa saja port berbeda). Ini memastikan koneksi ke backend
+         sudah warm sebelum fetchSettings() dipanggil, memotong TTFB settings API. -->
+    <link rel="preconnect" href="https://vividev.id" />
+    <link rel="dns-prefetch" href="https://vividev.id" />
+
+    <!-- Plus Jakarta Sans font — non-blocking load
+         Teknik: load sebagai media="print" lalu onload ganti ke media="all".
+         Ini mencegah browser menunggu font sebelum render (render-blocking).
+         display=optional: tidak ada FOUT/FOIT — browser pakai system font
+         pada first visit, font CMS dipakai setelah cached.
+         Fallback <noscript> untuk browser tanpa JS. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=optional"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=optional"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
@@ -71,7 +91,16 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- App-shell footer placeholder: reserves 300px so the browser layout
+           engine never shifts content when React hydrates and mounts the real
+           Footer. Background matches Footer's #0B1849. React replaces this
+           div entirely on hydration — no flicker. -->
+      <div style="display:flex;flex-direction:column;min-height:100vh">
+        <div style="flex:1"></div>
+        <footer style="min-height:300px;background:#0B1849"></footer>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

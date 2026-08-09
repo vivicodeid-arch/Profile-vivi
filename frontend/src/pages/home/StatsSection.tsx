@@ -54,10 +54,9 @@ export default function StatsSection() {
           {stats.map((s, i) => (
             <div
               key={s.label}
-              className="transition-all duration-700"
+              className="transition-opacity duration-700"
               style={{
                 opacity:         inView ? 1 : 0,
-                transform:       inView ? 'translateY(0)' : 'translateY(24px)',
                 transitionDelay: `${i * 100}ms`,
               }}
             >

@@ -1,15 +1,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { validate } from '../middleware/validate';
 import { contactLimiter } from '../middleware/rateLimit';
 import { authenticate } from '../middleware/auth.middleware';
 import { sendContactNotification, sendContactAutoReply } from '../services/email.service';
 import { AppError } from '../middleware/errorHandler';
 import { logger } from '../middleware/logger';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const contactSchema = z.object({
   name: z.string().min(2).max(100),

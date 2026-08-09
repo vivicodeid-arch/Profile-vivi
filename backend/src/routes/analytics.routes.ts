@@ -1,11 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware/auth.middleware';
-import { getAnalyticsSummary } from '../services/analytics.service';
-import { recordPageView } from '../services/analytics.service';
+import { getAnalyticsSummary, recordPageView } from '../services/analytics.service';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // POST /api/analytics/track - Public (called from frontend)
 router.post('/track', async (req: Request, res: Response, next: NextFunction) => {

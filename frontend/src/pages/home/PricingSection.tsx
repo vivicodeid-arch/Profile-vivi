@@ -28,7 +28,7 @@ export default function PricingSection({ plans }: PricingSectionProps) {
           </div>
           <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto animate-pulse">
             {[0, 1, 2].map(i => (
-              <div key={i} className="rounded-2xl bg-slate-800 h-96" />
+              <div key={i} className="rounded-2xl bg-slate-800 min-h-[500px]" />
             ))}
           </div>
         </div>
@@ -44,10 +44,9 @@ export default function PricingSection({ plans }: PricingSectionProps) {
     >
       <div className="container-custom">
         <div
-          className="transition-all duration-700 text-center"
+          className="transition-opacity duration-700 text-center"
           style={{
             opacity:   inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(30px)',
           }}
         >
           <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold">
@@ -82,11 +81,11 @@ export default function PricingSection({ plans }: PricingSectionProps) {
             return (
               <div
                 key={plan.id}
-                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-500 hover:z-20 
+                className={`relative flex flex-col rounded-2xl p-8 transition-[box-shadow,opacity] duration-500 hover:z-20 
                   bg-[#1e293b] border border-slate-700/50 
-                  ${isCenter ? 'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_10px_0_#020617] z-10 lg:scale-110 lg:-translate-y-4' : 'shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5),0_8px_0_#020617] z-0 lg:scale-95 opacity-90 hover:opacity-100'}
-                  ${isLeft ? 'lg:[transform:rotateY(15deg)] lg:origin-right' : ''}
-                  ${isRight ? 'lg:[transform:rotateY(-15deg)] lg:origin-left' : ''}
+                  ${isCenter ? 'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_10px_0_#020617] z-10 lg:scale-110 lg:-mt-4' : 'shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5),0_8px_0_#020617] z-0 lg:scale-95 opacity-90 hover:opacity-100'}
+                  ${isLeft ? 'lg:[transform:scale(0.95)_rotateY(15deg)] lg:origin-right' : ''}
+                  ${isRight ? 'lg:[transform:scale(0.95)_rotateY(-15deg)] lg:origin-left' : ''}
                 `}
               >
                 {/* Dashed red top border for center card */}

@@ -45,6 +45,10 @@ function Logo3DText({ siteName }: { siteName?: string }) {
   }, []);
 
   useEffect(() => {
+    // Only attach mousemove on pointer:fine devices (mouse/trackpad).
+    // On touch/stylus devices (pointer:coarse) this effect adds zero overhead.
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     return () => {
@@ -75,13 +79,28 @@ function Logo3DText({ siteName }: { siteName?: string }) {
 
 /** Wraps any element with a local mouse-tracking 3D tilt effect. */
 function Tilt3D({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref      = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup saat unmount — cancel timer pending agar tidak akses ref setelah unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    el.style.willChange = 'transform';
     const rect = el.getBoundingClientRect();
-    // position of cursor relative to element center, normalized -1..1
     const x = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
     const y = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
     const rotY =  x * 25;
@@ -95,6 +114,10 @@ function Tilt3D({ children, className }: { children: React.ReactNode; className?
     if (!el) return;
     el.style.transition = 'transform 0.4s ease-out';
     el.style.transform = 'perspective(300px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (ref.current) ref.current.style.willChange = 'auto';
+    }, 450);
   };
 
   return (
@@ -103,7 +126,7 @@ function Tilt3D({ children, className }: { children: React.ReactNode; className?
       className={className}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transformStyle: 'preserve-3d', willChange: 'transform', display: 'inline-block' }}
+      style={{ transformStyle: 'preserve-3d', display: 'inline-block' }}
     >
       {children}
     </div>
@@ -138,6 +161,16 @@ export default function Header() {
     setMenuOpen(false);
   }, [location.pathname]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const toggleLang = () => {
     i18n.changeLanguage(i18n.language === 'id' ? 'en' : 'id');
   };
@@ -156,13 +189,20 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-4 left-0 right-0 z-40 transition-all duration-300 px-4 ${
+      className={`fixed top-4 left-0 right-0 z-40 transition-[transform,opacity] duration-300 px-4 ${
         visible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}
     >
       <div className="container-custom mx-auto max-w-6xl">
-        <div className="bg-white dark:bg-gray-900 rounded-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1),0_6px_0_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3),0_6px_0_rgba(255,255,255,0.05)] border border-gray-100 dark:border-gray-800 flex items-center justify-between h-14 lg:h-16 px-4 lg:px-6 transition-all duration-300">
-          {/* Logo */}
+        <div className="bg-white dark:bg-gray-900 rounded-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1),0_6px_0_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3),0_6px_0_rgba(255,255,255,0.05)] border border-gray-100 dark:border-gray-800 flex items-center justify-between h-14 lg:h-16 px-4 lg:px-6 transition-[box-shadow,background-color,border-color] duration-300">
+          {/* Logo
+              CLS fix: wrapper diberi h-[28px] dan min-w-[100px] eksplisit agar
+              ukuran area logo tidak berubah saat settings.logoUrl datang dari API.
+              Tanpa ini, transisi dari fallback (ikon + teks) ke gambar logo CMS
+              menyebabkan reflowo lebar navbar dan layout shift yang terukur di CLS.
+              Dengan localStorage cache (settingsStore) logoUrl sudah tersedia di
+              render pertama pada kunjungan kedua+, tapi reserved space ini tetap
+              melindungi kunjungan pertama. */}
           <div className="flex-shrink-0 flex items-center">
             <Link
               to="/"
@@ -170,13 +210,19 @@ export default function Header() {
             >
               {settings.logoUrl ? (
                 <Tilt3D>
-                  <img src={getOptUrl(settings.logoUrl, 320)} alt={settings.siteName || 'Logo'} className="h-[28px] max-w-[130px] object-contain" width={200} height={50} />
+                  <img
+                    src={getOptUrl(settings.logoUrl, 320)}
+                    alt={settings.siteName || 'Logo'}
+                    className="h-[28px] max-w-[130px] object-contain"
+                    width={200}
+                    height={50}
+                  />
                 </Tilt3D>
               ) : (
-                <>
-                  <Code2 className="w-6 h-6 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+                <div className="flex items-center gap-2 h-[28px]">
+                  <Code2 className="w-6 h-6 text-primary-600 dark:text-primary-400 shrink-0" aria-hidden="true" />
                   <Logo3DText siteName={settings.siteName} />
-                </>
+                </div>
               )}
             </Link>
           </div>

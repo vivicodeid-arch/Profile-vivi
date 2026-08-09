@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Fires once when the element enters the viewport.
  * - Elements already fully above the fold (like HeroSection) fire immediately.
- * - Elements below the fold fire when they reach the middle 30% of the viewport.
+ * - Elements below the fold fire when they scroll into the bottom 10% of the viewport.
+ *   (reduced from -30% to -10% so animations trigger earlier on small mobile screens)
  */
 export function useInView(threshold = 0.1) {
   const ref = useRef<HTMLElement>(null);
@@ -12,6 +13,8 @@ export function useInView(threshold = 0.1) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    let observer: IntersectionObserver | null = null;
 
     const raf = requestAnimationFrame(() => {
       const rect = el.getBoundingClientRect();
@@ -22,21 +25,26 @@ export function useInView(threshold = 0.1) {
         return;
       }
 
-      const observer = new IntersectionObserver(
+      observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
             setInView(true);
-            observer.disconnect();
+            observer?.disconnect();
+            observer = null;
           }
         },
-        // trigger when element reaches the middle 30% of the viewport
-        { threshold, rootMargin: '0px 0px -30% 0px' },
+        // -10% instead of -30% so elements trigger sooner on short mobile viewports
+        { threshold, rootMargin: '0px 0px -10% 0px' },
       );
 
       observer.observe(el);
     });
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      // Always disconnect observer on cleanup to prevent memory leaks
+      observer?.disconnect();
+    };
   }, [threshold]);
 
   return { ref, inView };
@@ -45,6 +53,7 @@ export function useInView(threshold = 0.1) {
 /**
  * Animates a number from 0 to `target` over `duration` ms,
  * starting only when `inView` becomes true.
+ * Respects prefers-reduced-motion: jumps to target immediately.
  */
 export function useCountUp(target: number, inView: boolean, duration = 1800) {
   const [count, setCount] = useState(0);
@@ -52,21 +61,28 @@ export function useCountUp(target: number, inView: boolean, duration = 1800) {
   useEffect(() => {
     if (!inView) return;
 
-    // Use rAF instead of setInterval to avoid long main-thread tasks (TBT).
-    // rAF is throttled by the browser to the display refresh rate and never
-    // runs when the tab is in the background, which setInterval ignores.
+    // Respect reduced-motion preference — skip animation, show final value immediately
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCount(target);
+      return;
+    }
+
     let startTime: number | null = null;
     let rafId: number;
+    let prevValue = -1;
 
     const tick = (timestamp: number) => {
       if (startTime === null) startTime = timestamp;
       const elapsed  = timestamp - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      setCount(Math.floor(progress * target));
+      const next = progress < 1 ? Math.floor(progress * target) : target;
+      // Skip setState if value hasn't changed — avoids unnecessary re-renders
+      if (next !== prevValue) {
+        prevValue = next;
+        setCount(next);
+      }
       if (progress < 1) {
         rafId = requestAnimationFrame(tick);
-      } else {
-        setCount(target);
       }
     };
 

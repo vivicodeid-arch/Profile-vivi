@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { env } from '../config/env';
 
 const prisma = new PrismaClient();
 
@@ -11,7 +12,7 @@ export const recordPageView = async (
 ): Promise<void> => {
   // Hash IP for privacy compliance
   const ipHash = ip
-    ? crypto.createHash('sha256').update(ip + process.env.JWT_SECRET).digest('hex').slice(0, 16)
+    ? crypto.createHash('sha256').update(ip + env.JWT_SECRET).digest('hex').slice(0, 16)
     : undefined;
 
   await prisma.pageView.create({

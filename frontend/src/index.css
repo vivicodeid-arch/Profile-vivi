@@ -70,29 +70,34 @@
   }
 }
 
-/* Page transition animation */
+/* Page transition animation
+   PERF: Hanya animasi opacity — tidak ada transform/translateY.
+   translateY pada initial render menyebabkan CLS karena browser
+   mengukur posisi elemen sebelum dan sesudah transform, lalu
+   melaporkan pergeseran layout. Opacity-only tidak mempengaruhi
+   layout sama sekali sehingga CLS = 0 untuk page transitions. */
 @keyframes pageSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .page-animate {
-  animation: pageSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: pageSlideIn 0.25s ease-out forwards;
 }
 
-/* Legacy classes kept for compatibility */
-.page-enter {
-  opacity: 0;
-  transform: translateY(10px);
-}
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
+/* Respects user's reduced-motion preference.
+   Disables all CSS animations and transitions for users who have
+   requested reduced motion in their OS accessibility settings.
+   This covers particle-drift, pageSlideIn, animate-pulse-slow, etc. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .page-animate {
+    animation: none;
+    opacity: 1;
+  }
 }

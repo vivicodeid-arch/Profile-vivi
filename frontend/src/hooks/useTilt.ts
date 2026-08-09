@@ -10,29 +10,47 @@ interface TiltOptions {
  * Returns ref + event handlers that apply a CSS perspective 3D tilt effect
  * relative to the element's own bounding box — not the whole window.
  *
- * Uses will-change: transform so the browser promotes the element to its own
- * compositor layer, keeping tilt animations off the main thread (avoids the
- * "non-composited animations" Lighthouse audit warning).
+ * LCP fix: will-change:'transform' TIDAK lagi diset pada mount.
+ * Sebelumnya useEffect men-set willChange di mount, yang mempromosikan
+ * elemen ke GPU layer sejak render pertama — termasuk hero image yang
+ * merupakan LCP candidate. GPU layer promotion menambah overhead composite
+ * step dan dapat menunda LCP paint.
  *
- * Usage:
- *   const { ref, onMouseMove, onMouseLeave } = useTilt();
- *   <div ref={ref} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} />
+ * Sekarang willChange hanya diset saat mousemove aktif (user sudah
+ * berinteraksi, jauh setelah LCP sudah terhitung) dan di-reset saat
+ * mouseleave. Efek tilt identik, LCP tidak terdampak.
+ *
+ * Timer fix: timerRef dipakai untuk track setTimeout agar bisa di-cancel
+ * jika user kembali hover sebelum 500ms selesai — mencegah willChange
+ * di-reset saat animasi tilt masih aktif, sekaligus mencegah timer leak.
+ * useEffect cleanup memastikan timer di-cancel jika komponen unmount.
  */
 export function useTilt<T extends HTMLElement = HTMLDivElement>(opts: TiltOptions = {}) {
   const { maxRotate = 20, scale = 1.06, perspective = 600 } = opts;
-  const ref = useRef<T>(null);
+  const ref      = useRef<T>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Promote to compositor layer on mount, release on unmount
+  // Cleanup saat komponen unmount — cancel timer yang pending agar tidak
+  // mencoba mengakses ref.current setelah elemen sudah di-unmount
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.willChange = 'transform';
-    return () => { el.style.willChange = 'auto'; };
+    return () => {
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, []);
 
   const onMouseMove = useCallback((e: React.MouseEvent<T>) => {
     const el = ref.current;
     if (!el) return;
+    // Cancel pending willChange reset jika user kembali hover sebelum timer selesai
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    // Set willChange hanya saat interaksi — jauh setelah LCP sudah terhitung
+    el.style.willChange = 'transform';
     const rect = el.getBoundingClientRect();
     // normalized -1..1 relative to element center
     const x = ((e.clientX - rect.left)  / rect.width  - 0.5) * 2;
@@ -48,6 +66,12 @@ export function useTilt<T extends HTMLElement = HTMLDivElement>(opts: TiltOption
     if (!el) return;
     el.style.transition = 'transform 0.45s ease-out';
     el.style.transform  = `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+    // Release GPU layer setelah animasi selesai — timerRef memastikan cancel
+    // jika user hover lagi sebelum timeout, sehingga tidak ada leak
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (ref.current) ref.current.style.willChange = 'auto';
+    }, 500);
   }, [perspective]);
 
   return { ref, onMouseMove, onMouseLeave };

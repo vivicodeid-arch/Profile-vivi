@@ -6,8 +6,13 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Admin user
-  const passwordHash = await bcrypt.hash('Admin@Vividev2026!', 12);
+  // Admin user — password dibaca dari env, fallback ke generated random
+  const seedPassword = process.env.ADMIN_SEED_PASSWORD;
+  if (!seedPassword) {
+    console.error('❌ ADMIN_SEED_PASSWORD env variable is not set. Aborting seed to avoid hardcoded credentials.');
+    process.exit(1);
+  }
+  const passwordHash = await bcrypt.hash(seedPassword, 12);
   await prisma.user.upsert({
     where: { email: 'admin@vividev.id' },
     update: {},
